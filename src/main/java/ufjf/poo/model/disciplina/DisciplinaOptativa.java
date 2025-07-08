@@ -2,8 +2,8 @@ package ufjf.poo.model.disciplina;
 
 import java.util.LinkedList;
 
-public class DisciplinaEletiva extends Disciplina {
-    public DisciplinaEletiva(String codigo, String nome, int cargaHoraria) {
+public class DisciplinaOptativa extends Disciplina {
+    public DisciplinaOptativa(String codigo, String nome, int cargaHoraria) {
         super(codigo, nome, cargaHoraria);
     }
 
@@ -132,6 +132,6 @@ public class DisciplinaEletiva extends Disciplina {
      */
     @Override
     public tipoDisciplina getTipo() {
-        return tipoDisciplina.ELETIVA;
+        return tipoDisciplina.OPTATIVA;
     }
 }
