@@ -1,7 +1,7 @@
 package ufjf.poo.exception;
 
-public class CargaHorariaExcedidaException extends RuntimeException {
-  public CargaHorariaExcedidaException(String message) {
-    super(message);
+public class CargaHorariaExcedidaException extends ValidacaoMatriculaException {
+  public CargaHorariaExcedidaException(String mensagem) {
+    super("Carga horária excedida: " + mensagem);
   }
 }

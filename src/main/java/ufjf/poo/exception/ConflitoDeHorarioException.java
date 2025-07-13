@@ -1,7 +1,7 @@
 package ufjf.poo.exception;
 
-public class ConflitoDeHorarioException extends RuntimeException {
-  public ConflitoDeHorarioException(String message) {
-    super(message);
+public class ConflitoDeHorarioException extends ValidacaoMatriculaException {
+  public ConflitoDeHorarioException(String mensagem) {
+    super("Conflito de horário: " + mensagem);
   }
 }

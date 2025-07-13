@@ -1,7 +1,7 @@
 package ufjf.poo.exception;
 
-public class ValidacaoMatriculaException extends RuntimeException {
-  public ValidacaoMatriculaException(String message) {
-    super(message);
+public abstract class ValidacaoMatriculaException extends MatriculaException {
+  public ValidacaoMatriculaException(String mensagem) {
+    super(mensagem);
   }
 }

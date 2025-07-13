@@ -1,7 +1,7 @@
 package ufjf.poo.exception;
 
-public class GerenciamentoVagasException extends RuntimeException {
-  public GerenciamentoVagasException(String message) {
-    super(message);
+public abstract class GerenciamentoVagasException extends MatriculaException {
+  public GerenciamentoVagasException(String mensagem) {
+    super(mensagem);
   }
 }
