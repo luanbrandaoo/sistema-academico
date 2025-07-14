@@ -124,7 +124,7 @@ public class DisciplinaEletiva extends Disciplina {
      */
     @Override
     public int getCreditos() {
-        return cargaHoraria/30;
+        return cargaHoraria/15;
     }
 
     /**
