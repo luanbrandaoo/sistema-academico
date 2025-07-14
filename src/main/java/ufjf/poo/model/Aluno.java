@@ -5,19 +5,22 @@ import ufjf.poo.model.disciplina.NotaDisciplina;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 
 import ufjf.poo.exception.MatriculaInvalidaException;
 
 public class Aluno {
     private String nome;
     private String matricula;
-    private HashSet<NotaDisciplina> disciplinas;
+    private HashSet<NotaDisciplina> disciplinasPeriodo;
+    private HashSet<NotaDisciplina> disciplinasHistorico;
     private ArrayList<HashSet<Disciplina>> planejamento;
 
     public Aluno(String nome, String matricula) {
         this.nome = nome;
         this.planejamento = new ArrayList<>();
-        this.disciplinas = new HashSet<>();
+        this.disciplinasPeriodo = new HashSet<>();
+        this.disciplinasHistorico = new HashSet<>();
         try { validaMatricula(matricula); }
         catch (MatriculaInvalidaException ignored) {}
         this.matricula = matricula;
@@ -36,11 +39,11 @@ public class Aluno {
         validaMatricula(matricula);
         this.matricula = matricula;
     }
-    public HashSet<NotaDisciplina> getDisciplinas() {
-        return disciplinas;
+    public HashSet<NotaDisciplina> getDisciplinasPeriodo() {
+        return disciplinasPeriodo;
     }
-    public void setDisciplinas(HashSet<NotaDisciplina> disciplinas) {
-        this.disciplinas = disciplinas;
+    public void setDisciplinasPeriodo(HashSet<NotaDisciplina> disciplinasPeriodo) {
+        this.disciplinasPeriodo = disciplinasPeriodo;
     }
     public ArrayList<HashSet<Disciplina>> getPlanejamento() {
         return planejamento;
@@ -50,16 +53,28 @@ public class Aluno {
     }
 
     public void adicionarDisciplina(NotaDisciplina disciplina) {
-        this.disciplinas.add(disciplina);
+        this.disciplinasPeriodo.add(disciplina);
     }
     public void removerDisciplina(NotaDisciplina disciplina) {
-        this.disciplinas.remove(disciplina);
+        this.disciplinasPeriodo.remove(disciplina);
     }
     public void adicionarPeriodo(HashSet<Disciplina> periodo) {
         this.planejamento.add(periodo);
     }
     public void removerPeriodo(HashSet<Disciplina> periodo) {
         this.planejamento.remove(periodo);
+    }
+    public void adicionarConcluida(NotaDisciplina disciplina) {
+        this.disciplinasHistorico.add(disciplina);
+    }
+    public void removerConcluida(NotaDisciplina disciplina) {
+        this.disciplinasHistorico.remove(disciplina);
+    }
+    public HashSet<NotaDisciplina> getDisciplinasHistorico() {
+        return disciplinasHistorico;
+    }
+    public void setDisciplinasHistorico(HashSet<NotaDisciplina> disciplinasHistorico) {
+        this.disciplinasHistorico = disciplinasHistorico;
     }
 
     private void validaMatricula (String matricula) throws MatriculaInvalidaException {
@@ -104,4 +119,10 @@ public class Aluno {
             ));
     }
 
+    public boolean concluiu(Disciplina disciplina) {
+
+    }
+
+    public Map<Object, Object> getDisciplinasCursadas() {
+    }
 }
