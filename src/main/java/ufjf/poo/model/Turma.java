@@ -1,4 +1,47 @@
 package ufjf.poo.model;
+/*
+ID da turma, capacidade máxima, número atual de alunos matriculados e o horário fixo da aula.
+ */
+
+import java.util.LinkedList;
 
 public class Turma {
+    private final int id;
+    private int capacidadeMaxima;
+    private int numeroAlunosMatriculados;
+    private LinkedList<DiaHorario> horarios;
+
+    static int idTotal = 0;
+
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, LinkedList<DiaHorario> horarios) {
+        this.id = idTotal++;
+        this.capacidadeMaxima = capacidadeMaxima;
+        this.numeroAlunosMatriculados = numeroAlunosMatriculados;
+        this.horarios = horarios;
+    }
+    public int getId() {
+        return id;
+    }
+    public int getCapacidadeMaxima() {
+        return capacidadeMaxima;
+    }
+    public void setCapacidadeMaxima(int capacidadeMaxima) {
+        this.capacidadeMaxima = capacidadeMaxima;
+    }
+    public int getNumeroAlunosMatriculados() {
+        return numeroAlunosMatriculados;
+    }
+    public void setNumeroAlunosMatriculados(int numeroAlunosMatriculados) {
+        this.numeroAlunosMatriculados = numeroAlunosMatriculados;
+    }
+    public LinkedList<DiaHorario> getHorarios() {
+        return horarios;
+    }
+    public void setHorarios(LinkedList<DiaHorario> horarios) {
+        this.horarios = horarios;
+    }
+    @Override
+    public String toString() {
+        return "Turma{" + "id=" + id + ", capacidadeMaxima=" + capacidadeMaxima + ", numeroAlunosMatriculados=" + numeroAlunosMatriculados + ", horario=" + horarios + '}';
+    }
 }
