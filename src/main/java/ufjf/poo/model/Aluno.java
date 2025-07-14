@@ -107,22 +107,15 @@ public class Aluno {
     }
     
     public boolean concluiu(Disciplina disciplina) {
-        return disciplinas.stream()
+        return disciplinasHistorico.stream()
             .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
     }
     
     public java.util.Map<Disciplina, Float> getDisciplinasCursadas() {
-        return disciplinas.stream()
+        return disciplinasHistorico.stream()
             .collect(java.util.stream.Collectors.toMap(
                 NotaDisciplina::disciplina,
                 NotaDisciplina::nota
             ));
-    }
-
-    public boolean concluiu(Disciplina disciplina) {
-
-    }
-
-    public Map<Object, Object> getDisciplinasCursadas() {
     }
 }
