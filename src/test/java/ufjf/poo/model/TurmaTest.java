@@ -225,4 +225,121 @@ class TurmaTest {
         turmaCapacidadeZero.setNumeroAlunosMatriculados(5);
         assertTrue(turmaCapacidadeZero.getNumeroAlunosMatriculados() > turmaCapacidadeZero.getCapacidadeMaxima());
     }
+    
+    @Test
+    @DisplayName("Deve verificar disponibilidade de vagas corretamente")
+    void testTemVagasDisponiveis() {
+        // turma vazia
+        assertTrue(turma.temVagasDisponiveis());
+        
+        // turma parcialmente ocupada
+        turma.setNumeroAlunosMatriculados(25);
+        assertTrue(turma.temVagasDisponiveis());
+        
+        // turma lotada
+        turma.setNumeroAlunosMatriculados(30);
+        assertFalse(turma.temVagasDisponiveis());
+        
+        // turma superlotada
+        turma.setNumeroAlunosMatriculados(35);
+        assertFalse(turma.temVagasDisponiveis());
+    }
+    
+    @Test
+    @DisplayName("Deve calcular vagas restantes corretamente com método específico")
+    void testGetVagasRestantes() {
+        // turma vazia
+        assertEquals(30, turma.getVagasRestantes());
+        
+        // turma parcialmente ocupada
+        turma.setNumeroAlunosMatriculados(20);
+        assertEquals(10, turma.getVagasRestantes());
+        
+        // turma lotada
+        turma.setNumeroAlunosMatriculados(30);
+        assertEquals(0, turma.getVagasRestantes());
+        
+        // turma superlotada (deve retornar 0, não negativo)
+        turma.setNumeroAlunosMatriculados(35);
+        assertEquals(0, turma.getVagasRestantes());
+    }
+    
+    @Test
+    @DisplayName("Deve adicionar aluno se houver vagas")
+    void testAdicionarAluno() {
+        // turma vazia - deve conseguir adicionar
+        assertTrue(turma.adicionarAluno());
+        assertEquals(1, turma.getNumeroAlunosMatriculados());
+        
+        // adicionar até lotar
+        for (int i = 1; i < 30; i++) {
+            assertTrue(turma.adicionarAluno());
+        }
+        assertEquals(30, turma.getNumeroAlunosMatriculados());
+        
+        // tentar adicionar quando lotada - deve falhar
+        assertFalse(turma.adicionarAluno());
+        assertEquals(30, turma.getNumeroAlunosMatriculados());
+    }
+    
+    @Test
+    @DisplayName("Deve remover aluno se houver alunos matriculados")
+    void testRemoverAluno() {
+        // turma vazia - não deve conseguir remover
+        assertFalse(turma.removerAluno());
+        assertEquals(0, turma.getNumeroAlunosMatriculados());
+        
+        // adicionar alguns alunos e remover
+        turma.setNumeroAlunosMatriculados(5);
+        assertTrue(turma.removerAluno());
+        assertEquals(4, turma.getNumeroAlunosMatriculados());
+        
+        // remover todos
+        for (int i = 4; i > 0; i--) {
+            assertTrue(turma.removerAluno());
+        }
+        assertEquals(0, turma.getNumeroAlunosMatriculados());
+        
+        // tentar remover de turma vazia novamente
+        assertFalse(turma.removerAluno());
+        assertEquals(0, turma.getNumeroAlunosMatriculados());
+    }
+    
+    @Test
+    @DisplayName("Deve detectar conflito de horário usando método específico")
+    void testTemConflitoDeHorarioMetodo() {
+        // Turma 1: Segunda 8h, Quarta 8h
+        LinkedList<DiaHorario> horarios1 = new LinkedList<>();
+        horarios1.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
+        horarios1.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
+        Turma turma1 = new Turma(30, 0, horarios1);
+        
+        // Turma 2: Segunda 8h (conflito), Sexta 10h
+        LinkedList<DiaHorario> horarios2 = new LinkedList<>();
+        horarios2.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0))); // conflito
+        horarios2.add(new DiaHorario(DayOfWeek.FRIDAY, LocalTime.of(10, 0)));
+        Turma turma2 = new Turma(25, 0, horarios2);
+        
+        // Turma 3: Terça 10h, Quinta 14h (sem conflito)
+        LinkedList<DiaHorario> horarios3 = new LinkedList<>();
+        horarios3.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
+        horarios3.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(14, 0)));
+        Turma turma3 = new Turma(20, 0, horarios3);
+        
+        // Testar conflitos
+        assertTrue(turma1.temConflitoDeHorario(turma2), "Deve haver conflito entre turma1 e turma2");
+        assertTrue(turma2.temConflitoDeHorario(turma1), "Conflito deve ser simétrico");
+        
+        assertFalse(turma1.temConflitoDeHorario(turma3), "Não deve haver conflito entre turma1 e turma3");
+        assertFalse(turma3.temConflitoDeHorario(turma1), "Não-conflito deve ser simétrico");
+        
+        assertFalse(turma2.temConflitoDeHorario(turma3), "Não deve haver conflito entre turma2 e turma3");
+        assertFalse(turma3.temConflitoDeHorario(turma2), "Não-conflito deve ser simétrico");
+    }
+    
+    @Test
+    @DisplayName("Turma não deve ter conflito consigo mesma")
+    void testSemConflitoConsigoMesma() {
+        assertTrue(turma.temConflitoDeHorario(turma), "Turma deve ter conflito consigo mesma");
+    }
 }
