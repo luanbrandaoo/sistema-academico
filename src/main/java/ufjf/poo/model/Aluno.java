@@ -71,11 +71,10 @@ public class Aluno {
 
         for(int i = beginIndexMatricula; i <= maxLengthMatricula; i++) {
             if(!Character.isDigit(matricula.charAt(i))) {
-                final String matriculaRuim = matricula;
                 this.matricula = null;
                 throw new MatriculaInvalidaException(
                         "Matricula inválida! Todos os caracteres devem ser números." +
-                        "Matricula incorreta: " + matriculaRuim);
+                        "Matricula incorreta: " + matricula);
             }
         }
 
@@ -86,8 +85,6 @@ public class Aluno {
         final int anoMin = 1940;
         final int anoMax = 2025;
         if(ano < anoMin || ano > anoMax) {
-            final String matriculaRuim = matricula;
-            matricula = null;
             throw new MatriculaInvalidaException(
                     "Matricula inválida! Os 4 primeiros caracteres devem ser um ano válido." +
                             "Ano inválido: " + ano);
