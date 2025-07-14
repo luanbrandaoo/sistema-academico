@@ -3,6 +3,8 @@ package ufjf.poo.model;
 ID da turma, capacidade máxima, número atual de alunos matriculados e o horário fixo da aula.
  */
 
+import ufjf.poo.model.disciplina.Disciplina;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.LinkedList;
@@ -11,15 +13,17 @@ public class Turma {
     private final int id;
     private int capacidadeMaxima;
     private int numeroAlunosMatriculados;
+    private final Disciplina disciplina;
     private LinkedList<DiaHorario> horarios;
 
     static int idTotal = 0;
 
-    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, LinkedList<DiaHorario> horarios) {
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina, LinkedList<DiaHorario> horarios) {
         this.id = idTotal++;
         this.capacidadeMaxima = capacidadeMaxima;
         this.numeroAlunosMatriculados = numeroAlunosMatriculados;
         this.horarios = horarios;
+        this.disciplina = disciplina;
     }
     public int getId() {
         return id;
@@ -42,15 +46,15 @@ public class Turma {
     public void setHorarios(LinkedList<DiaHorario> horarios) {
         this.horarios = horarios;
     }
-    
+
     public boolean temVagasDisponiveis() {
         return numeroAlunosMatriculados < capacidadeMaxima;
     }
-    
+
     public int getVagasRestantes() {
         return Math.max(0, capacidadeMaxima - numeroAlunosMatriculados);
     }
-    
+
     public boolean adicionarAluno() {
         if (temVagasDisponiveis()) {
             numeroAlunosMatriculados++;
@@ -58,7 +62,7 @@ public class Turma {
         }
         return false;
     }
-    
+
     public boolean removerAluno() {
         if (numeroAlunosMatriculados > 0) {
             numeroAlunosMatriculados--;
@@ -66,12 +70,14 @@ public class Turma {
         }
         return false;
     }
-    
+
     public boolean temConflitoDeHorario(Turma outraTurma) {
         return this.horarios.stream()
             .anyMatch(horario -> outraTurma.getHorarios().contains(horario));
     }
-    
+
+    public Disciplina getDisciplina() {return disciplina; }
+
     @Override
     public String toString() {
         return "Turma{" + "id=" + id + ", capacidadeMaxima=" + capacidadeMaxima +
