@@ -69,7 +69,7 @@ public class Aluno {
         if(matricula.length() > maxLengthMatricula)
             matricula = matricula.substring(beginIndexMatricula, maxLengthMatricula);
 
-        for(int i = beginIndexMatricula; i <= maxLengthMatricula; i++) {
+        for(int i = beginIndexMatricula; i < matricula.length(); i++) {
             if(!Character.isDigit(matricula.charAt(i))) {
                 this.matricula = null;
                 throw new MatriculaInvalidaException(
@@ -89,6 +89,19 @@ public class Aluno {
                     "Matricula inválida! Os 4 primeiros caracteres devem ser um ano válido." +
                             "Ano inválido: " + ano);
         }
+    }
+    
+    public boolean concluiu(Disciplina disciplina) {
+        return disciplinas.stream()
+            .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
+    }
+    
+    public java.util.Map<Disciplina, Float> getDisciplinasCursadas() {
+        return disciplinas.stream()
+            .collect(java.util.stream.Collectors.toMap(
+                NotaDisciplina::disciplina,
+                NotaDisciplina::nota
+            ));
     }
 
 }
