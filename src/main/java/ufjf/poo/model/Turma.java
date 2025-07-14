@@ -42,6 +42,36 @@ public class Turma {
     public void setHorarios(LinkedList<DiaHorario> horarios) {
         this.horarios = horarios;
     }
+    
+    public boolean temVagasDisponiveis() {
+        return numeroAlunosMatriculados < capacidadeMaxima;
+    }
+    
+    public int getVagasRestantes() {
+        return Math.max(0, capacidadeMaxima - numeroAlunosMatriculados);
+    }
+    
+    public boolean adicionarAluno() {
+        if (temVagasDisponiveis()) {
+            numeroAlunosMatriculados++;
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean removerAluno() {
+        if (numeroAlunosMatriculados > 0) {
+            numeroAlunosMatriculados--;
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean temConflitoDeHorario(Turma outraTurma) {
+        return this.horarios.stream()
+            .anyMatch(horario -> outraTurma.getHorarios().contains(horario));
+    }
+    
     @Override
     public String toString() {
         return "Turma{" + "id=" + id + ", capacidadeMaxima=" + capacidadeMaxima +
