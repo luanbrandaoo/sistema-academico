@@ -36,4 +36,23 @@ public abstract class Disciplina {
     public abstract int getCreditos();
     public abstract tipoDisciplina getTipo();
     // equiparação?
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Disciplina that = (Disciplina) obj;
+        return codigo != null ? codigo.equals(that.codigo) : that.codigo == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return codigo != null ? codigo.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Disciplina{codigo='%s', nome='%s', cargaHoraria=%d, tipo=%s}", 
+                           codigo, nome, cargaHoraria, getTipo());
+    }
 }
