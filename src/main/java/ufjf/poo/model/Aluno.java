@@ -5,7 +5,6 @@ import ufjf.poo.model.disciplina.NotaDisciplina;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 
 import ufjf.poo.exception.MatriculaInvalidaException;
 
@@ -107,15 +106,25 @@ public class Aluno {
     }
     
     public boolean concluiu(Disciplina disciplina) {
-        return disciplinasHistorico.stream()
+        // verifica tanto no histórico quanto no período atual
+        boolean noHistorico = disciplinasHistorico.stream()
             .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
+        
+        boolean noPeriodo = disciplinasPeriodo.stream()
+            .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
+            
+        return noHistorico || noPeriodo;
     }
     
     public java.util.Map<Disciplina, Float> getDisciplinasCursadas() {
-        return disciplinasHistorico.stream()
-            .collect(java.util.stream.Collectors.toMap(
-                NotaDisciplina::disciplina,
-                NotaDisciplina::nota
-            ));
+        java.util.Map<Disciplina, Float> todasDisciplinas = new java.util.HashMap<>();
+        // adiciona disciplinas do histórico e do período atual
+        disciplinasHistorico.stream()
+            .forEach(nd -> todasDisciplinas.put(nd.disciplina(), nd.nota()));
+        
+        disciplinasPeriodo.stream()
+            .forEach(nd -> todasDisciplinas.put(nd.disciplina(), nd.nota()));
+            
+        return todasDisciplinas;
     }
 }
