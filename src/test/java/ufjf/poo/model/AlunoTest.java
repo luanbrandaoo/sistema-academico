@@ -28,9 +28,9 @@ class AlunoTest {
     void testCriacaoAluno() {
         assertEquals("João Silva", aluno.getNome());
         assertEquals("202501001", aluno.getMatricula());
-        assertNotNull(aluno.getDisciplinas());
+        assertNotNull(aluno.getDisciplinasPeriodo());
         assertNotNull(aluno.getPlanejamento());
-        assertTrue(aluno.getDisciplinas().isEmpty());
+        assertTrue(aluno.getDisciplinasPeriodo().isEmpty());
         assertTrue(aluno.getPlanejamento().isEmpty());
     }
     
@@ -51,8 +51,8 @@ class AlunoTest {
         NotaDisciplina notaDisciplina = new NotaDisciplina(75.0f, disciplina1);
         
         aluno.adicionarDisciplina(notaDisciplina);
-        assertEquals(1, aluno.getDisciplinas().size());
-        assertTrue(aluno.getDisciplinas().contains(notaDisciplina));
+        assertEquals(1, aluno.getDisciplinasPeriodo().size());
+        assertTrue(aluno.getDisciplinasPeriodo().contains(notaDisciplina));
     }
     
     @Test
@@ -61,11 +61,11 @@ class AlunoTest {
         NotaDisciplina notaDisciplina = new NotaDisciplina(75.0f, disciplina1);
         
         aluno.adicionarDisciplina(notaDisciplina);
-        assertEquals(1, aluno.getDisciplinas().size());
+        assertEquals(1, aluno.getDisciplinasPeriodo().size());
         
         aluno.removerDisciplina(notaDisciplina);
-        assertEquals(0, aluno.getDisciplinas().size());
-        assertFalse(aluno.getDisciplinas().contains(notaDisciplina));
+        assertEquals(0, aluno.getDisciplinasPeriodo().size());
+        assertFalse(aluno.getDisciplinasPeriodo().contains(notaDisciplina));
     }
     
     @Test
@@ -77,9 +77,9 @@ class AlunoTest {
         aluno.adicionarDisciplina(nota1);
         aluno.adicionarDisciplina(nota2);
         
-        assertEquals(2, aluno.getDisciplinas().size());
-        assertTrue(aluno.getDisciplinas().contains(nota1));
-        assertTrue(aluno.getDisciplinas().contains(nota2));
+        assertEquals(2, aluno.getDisciplinasPeriodo().size());
+        assertTrue(aluno.getDisciplinasPeriodo().contains(nota1));
+        assertTrue(aluno.getDisciplinasPeriodo().contains(nota2));
     }
     
     @Test
@@ -91,7 +91,7 @@ class AlunoTest {
         aluno.adicionarDisciplina(nota1);
         aluno.adicionarDisciplina(nota2);
         
-        assertTrue(aluno.getDisciplinas().size() <= 2);
+        assertTrue(aluno.getDisciplinasPeriodo().size() <= 2);
     }
     
     @Test
@@ -148,12 +148,12 @@ class AlunoTest {
         aluno.adicionarDisciplina(notaAprovado);
         aluno.adicionarDisciplina(notaReprovado);
         
-        assertEquals(2, aluno.getDisciplinas().size());
+        assertEquals(2, aluno.getDisciplinasPeriodo().size());
         
         // verificar se as notas são armazenadas corretamente
-        assertTrue(aluno.getDisciplinas().stream()
+        assertTrue(aluno.getDisciplinasPeriodo().stream()
             .anyMatch(nd -> nd.nota() == 75.0f));
-        assertTrue(aluno.getDisciplinas().stream()
+        assertTrue(aluno.getDisciplinasPeriodo().stream()
             .anyMatch(nd -> nd.nota() == 50.0f));
     }
 }
