@@ -14,7 +14,7 @@ public class ValidadorCreditosMinimos implements ValidadorPreRequisito {
     public boolean validar(Aluno aluno, Disciplina disciplina) {
         int totalCreditos = aluno.getDisciplinasCursadas().entrySet().stream()
                 .filter(entry -> entry.getValue() >= 60)
-                .mapToInt(entry -> entry.getKey().getCargaHorariaSemanal())
+                .mapToInt(entry -> entry.getKey().getCreditos())
                 .sum();
         return totalCreditos >= creditosMinimos;
     }
