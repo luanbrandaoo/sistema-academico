@@ -323,7 +323,6 @@ public class SistemaAcademico {
             
             System.out.println("Todos os testes demonstrativos executados com sucesso!");
             System.out.println();
-            System.out.println("Para executar os testes unitários completos, use: mvn test");
             
         } catch (Exception e) {
             System.err.println("Erro durante a execução dos testes: " + e.getMessage());
