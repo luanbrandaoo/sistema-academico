@@ -1,29 +1,32 @@
 package ufjf.poo.model;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import ufjf.poo.exception.TurmaCheiaException;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Testes da Classe Turma")
 class TurmaTest {
     
     private Turma turma;
-    private LinkedList<DiaHorario> horarios;
+    private List<DiaHorario> horarios;
     
     @BeforeEach
     void setUp() {
         // reset do contador estático para testes isolados
         Turma.idTotal = 0;
         
-        horarios = new LinkedList<>();
+        horarios = new ArrayList<>();
         horarios.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horarios.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
-        
+
         turma = new Turma(30, 0, horarios);
     }
     
@@ -72,7 +75,7 @@ class TurmaTest {
     @Test
     @DisplayName("Deve permitir alterar horários")
     void testAlterarHorarios() {
-        LinkedList<DiaHorario> novosHorarios = new LinkedList<>();
+        List<DiaHorario> novosHorarios = new ArrayList<>();
         novosHorarios.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
         novosHorarios.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(10, 0)));
         
@@ -119,7 +122,7 @@ class TurmaTest {
     @Test
     @DisplayName("Deve gerenciar horários múltiplos")
     void testHorariosMultiplos() {
-        LinkedList<DiaHorario> horariosComplexos = new LinkedList<>();
+        List<DiaHorario> horariosComplexos = new ArrayList<>();
         horariosComplexos.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horariosComplexos.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(10, 0)));
         horariosComplexos.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
@@ -138,19 +141,19 @@ class TurmaTest {
     @DisplayName("Deve verificar conflito de horários entre turmas")
     void testConflitoHorarios() {
         // turma 1: Segunda 8h-10h, Quarta 8h-10h
-        LinkedList<DiaHorario> horarios1 = new LinkedList<>();
+        List<DiaHorario> horarios1 = new ArrayList<>();
         horarios1.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horarios1.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
         Turma turma1 = new Turma(30, 0, horarios1);
-        
+
         // turma 2: Segunda 8h-10h (conflito), Sexta 10h-12h
-        LinkedList<DiaHorario> horarios2 = new LinkedList<>();
+        List<DiaHorario> horarios2 = new ArrayList<>();
         horarios2.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0))); // conflito
         horarios2.add(new DiaHorario(DayOfWeek.FRIDAY, LocalTime.of(10, 0)));
         Turma turma2 = new Turma(25, 0, horarios2);
-        
+
         // turma 3: Terça 10h-12h, Quinta 14h-16h (sem conflito)
-        LinkedList<DiaHorario> horarios3 = new LinkedList<>();
+        List<DiaHorario> horarios3 = new ArrayList<>();
         horarios3.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
         horarios3.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(14, 0)));
         Turma turma3 = new Turma(20, 0, horarios3);
@@ -186,7 +189,7 @@ class TurmaTest {
     @Test
     @DisplayName("Deve permitir turmas com horários vazios")
     void testTurmaHorariosVazios() {
-        LinkedList<DiaHorario> horariosVazios = new LinkedList<>();
+        List<DiaHorario> horariosVazios = new ArrayList<>();
         Turma turmaSemHorario = new Turma(15, 0, horariosVazios);
         
         assertEquals(0, turmaSemHorario.getHorarios().size());
@@ -196,7 +199,7 @@ class TurmaTest {
     @Test
     @DisplayName("Deve aceitar diferentes horários no mesmo dia")
     void testMesmoDialHorasDiferentes() {
-        LinkedList<DiaHorario> horariosMesmoDia = new LinkedList<>();
+        List<DiaHorario> horariosMesmoDia = new ArrayList<>();
         horariosMesmoDia.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horariosMesmoDia.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(10, 0)));
         horariosMesmoDia.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(14, 0)));
@@ -266,19 +269,28 @@ class TurmaTest {
     
     @Test
     @DisplayName("Deve adicionar aluno se houver vagas")
-    void testAdicionarAluno() {
+    void testMatriculaAluno() {
         // turma vazia - deve conseguir adicionar
-        assertTrue(turma.adicionarAluno());
+        assertDoesNotThrow(
+                () -> turma.matriculaAluno("202465557"),
+                "Teste de adicionar aluno em turma vazia falhou"
+        );
         assertEquals(1, turma.getNumeroAlunosMatriculados());
         
         // adicionar até lotar
         for (int i = 1; i < 30; i++) {
-            assertTrue(turma.adicionarAluno());
+            assertDoesNotThrow(() -> turma.matriculaAluno("202465055"),
+                    "Teste de adicionar aluno em turma não cheia falhou");
         }
         assertEquals(30, turma.getNumeroAlunosMatriculados());
         
         // tentar adicionar quando lotada - deve falhar
-        assertFalse(turma.adicionarAluno());
+        assertThrows(
+                TurmaCheiaException.class,
+                () -> turma.matriculaAluno("199000001"),
+                "Teste de adicionar aluno em turma lotada falhou"
+        );
+
         assertEquals(30, turma.getNumeroAlunosMatriculados());
     }
     
@@ -309,19 +321,19 @@ class TurmaTest {
     @DisplayName("Deve detectar conflito de horário usando método específico")
     void testTemConflitoDeHorarioMetodo() {
         // turma 1: Segunda 8h, Quarta 8h
-        LinkedList<DiaHorario> horarios1 = new LinkedList<>();
+        List<DiaHorario> horarios1 = new ArrayList<>();
         horarios1.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horarios1.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
         Turma turma1 = new Turma(30, 0, horarios1);
-        
+
         // turma 2: Segunda 8h (conflito), Sexta 10h
-        LinkedList<DiaHorario> horarios2 = new LinkedList<>();
+        List<DiaHorario> horarios2 = new ArrayList<>();
         horarios2.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0))); // conflito
         horarios2.add(new DiaHorario(DayOfWeek.FRIDAY, LocalTime.of(10, 0)));
         Turma turma2 = new Turma(25, 0, horarios2);
-        
+
         // turma 3: Terça 10h, Quinta 14h (sem conflito)
-        LinkedList<DiaHorario> horarios3 = new LinkedList<>();
+        List<DiaHorario> horarios3 = new ArrayList<>();
         horarios3.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
         horarios3.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(14, 0)));
         Turma turma3 = new Turma(20, 0, horarios3);

@@ -49,9 +49,9 @@ class DisciplinaTest {
     @Test
     @DisplayName("Todas as disciplinas devem herdar de Disciplina")
     void testHerancaDisciplina() {
-        assertTrue(disciplinaObrigatoria instanceof Disciplina);
-        assertTrue(disciplinaEletiva instanceof Disciplina);
-        assertTrue(disciplinaOptativa instanceof Disciplina);
+        assertInstanceOf(Disciplina.class, disciplinaObrigatoria);
+        assertInstanceOf(Disciplina.class, disciplinaEletiva);
+        assertInstanceOf(Disciplina.class, disciplinaOptativa);
     }
     
     @Test

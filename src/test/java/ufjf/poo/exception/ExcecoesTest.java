@@ -12,9 +12,9 @@ public class ExcecoesTest {
     void testHerancaPreRequisitoException() {
         PreRequisitoNaoCumpridoException exception = 
             new PreRequisitoNaoCumpridoException("teste");
-        
-        assertTrue(exception instanceof ValidacaoMatriculaException);
-        assertTrue(exception instanceof MatriculaException);
+
+        assertInstanceOf(ValidacaoMatriculaException.class, exception);
+        assertInstanceOf(MatriculaException.class, exception);
         assertTrue(exception.getMessage().contains("Pré-requisito não cumprido"));
     }
     
@@ -23,9 +23,9 @@ public class ExcecoesTest {
     void testHerancaCoRequisitoException() {
         CoRequisitoNaoAtendidoException exception = 
             new CoRequisitoNaoAtendidoException("teste");
-        
-        assertTrue(exception instanceof ValidacaoMatriculaException);
-        assertTrue(exception instanceof MatriculaException);
+
+        assertInstanceOf(ValidacaoMatriculaException.class, exception);
+        assertInstanceOf(MatriculaException.class, exception);
         assertTrue(exception.getMessage().contains("Co-requisito não atendido"));
     }
     
@@ -34,9 +34,9 @@ public class ExcecoesTest {
     void testHerancaCargaHorariaException() {
         CargaHorariaExcedidaException exception = 
             new CargaHorariaExcedidaException("teste");
-        
-        assertTrue(exception instanceof ValidacaoMatriculaException);
-        assertTrue(exception instanceof MatriculaException);
+
+        assertInstanceOf(ValidacaoMatriculaException.class, exception);
+        assertInstanceOf(MatriculaException.class, exception);
         assertTrue(exception.getMessage().contains("Carga horária excedida"));
     }
     
@@ -45,9 +45,9 @@ public class ExcecoesTest {
     void testHerancaConflitoHorarioException() {
         ConflitoDeHorarioException exception = 
             new ConflitoDeHorarioException("teste");
-        
-        assertTrue(exception instanceof ValidacaoMatriculaException);
-        assertTrue(exception instanceof MatriculaException);
+
+        assertInstanceOf(ValidacaoMatriculaException.class, exception);
+        assertInstanceOf(MatriculaException.class, exception);
         assertTrue(exception.getMessage().contains("Conflito de horário"));
     }
     
@@ -56,9 +56,9 @@ public class ExcecoesTest {
     void testHerancaTurmaCheiaException() {
         TurmaCheiaException exception = 
             new TurmaCheiaException("teste");
-        
-        assertTrue(exception instanceof GerenciamentoVagasException);
-        assertTrue(exception instanceof MatriculaException);
+
+        assertInstanceOf(GerenciamentoVagasException.class, exception);
+        assertInstanceOf(MatriculaException.class, exception);
         assertTrue(exception.getMessage().contains("Turma cheia"));
     }
     
@@ -67,12 +67,12 @@ public class ExcecoesTest {
     void testEstruturaHerancaExcecoes() {
         PreRequisitoNaoCumpridoException preReqException = 
             new PreRequisitoNaoCumpridoException("Teste");
-        assertTrue(preReqException instanceof ValidacaoMatriculaException);
-        assertTrue(preReqException instanceof MatriculaException);
+        assertInstanceOf(ValidacaoMatriculaException.class, preReqException);
+        assertInstanceOf(MatriculaException.class, preReqException);
         
         TurmaCheiaException turmaCheiaException = 
             new TurmaCheiaException("Teste");
-        assertTrue(turmaCheiaException instanceof GerenciamentoVagasException);
-        assertTrue(turmaCheiaException instanceof MatriculaException);
+        assertInstanceOf(GerenciamentoVagasException.class, turmaCheiaException);
+        assertInstanceOf(MatriculaException.class, turmaCheiaException);
     }
 }

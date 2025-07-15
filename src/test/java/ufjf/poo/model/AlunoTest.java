@@ -1,13 +1,16 @@
 package ufjf.poo.model;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
-
-import ufjf.poo.model.disciplina.DisciplinaObrigatoria;
+import org.junit.jupiter.api.Test;
 import ufjf.poo.model.disciplina.Disciplina;
+import ufjf.poo.model.disciplina.DisciplinaObrigatoria;
 import ufjf.poo.model.disciplina.NotaDisciplina;
+
+import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Testes da Classe Aluno")
 class AlunoTest {
@@ -18,7 +21,10 @@ class AlunoTest {
     
     @BeforeEach
     void setUp() {
-        aluno = new Aluno("João Silva", "202501001");
+        assertDoesNotThrow(
+                () -> aluno = new Aluno("João Silva", "202501001"),
+                "Teste de criar aluno falhou"
+        );
         disciplina1 = new DisciplinaObrigatoria("MAT001", "Cálculo I", 60);
         disciplina2 = new DisciplinaObrigatoria("MAT002", "Álgebra Linear", 45);
     }
@@ -99,7 +105,7 @@ class AlunoTest {
     void testGerenciarPlanejamento() {
         // testa se é possível adicionar períodos ao planejamento
         assertDoesNotThrow(() -> {
-            java.util.HashSet<Disciplina> periodo = new java.util.HashSet<>();
+            HashSet<Disciplina> periodo = new HashSet<>();
             periodo.add(disciplina1);
             periodo.add(disciplina2);
             aluno.getPlanejamento().add(periodo);
@@ -114,9 +120,7 @@ class AlunoTest {
         aluno.setNome("Maria Santos");
         assertEquals("Maria Santos", aluno.getNome());
         
-        assertDoesNotThrow(() -> {
-            aluno.setMatricula("202501002");
-        });
+        assertDoesNotThrow(() -> aluno.setMatricula("202501002"));
         assertEquals("202501002", aluno.getMatricula());
     }
     
@@ -124,8 +128,11 @@ class AlunoTest {
     @DisplayName("Deve validar formato de matrícula")
     void testValidacaoMatricula() {
         // a validação está na classe, mas o construtor não lança exceção
-        Aluno alunoTeste = new Aluno("Teste", "202501001");
-        assertEquals("202501001", alunoTeste.getMatricula());
+        AtomicReference<Aluno> alunoTeste = new AtomicReference<>();
+        assertDoesNotThrow(
+                () -> alunoTeste.set(new Aluno("Teste", "202501001"))
+        );
+        assertEquals("202501001", alunoTeste.get().getMatricula());
     }
     
     @Test
