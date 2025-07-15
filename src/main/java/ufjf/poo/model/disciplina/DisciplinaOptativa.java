@@ -1,6 +1,7 @@
 package ufjf.poo.model.disciplina;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DisciplinaOptativa extends Disciplina {
     public DisciplinaOptativa(String codigo, String nome, int cargaHoraria) {
@@ -35,7 +36,7 @@ public class DisciplinaOptativa extends Disciplina {
      * @return Lista de pré-requisitos simples da disciplina (sem contar pré-requisitos dos pré-requisitos)
      */
     @Override
-    public LinkedList<Disciplina> getPreRequisitos() {
+    public List<List<Disciplina>> getPreRequisitos() {
         return preRequisitos;
     }
 
@@ -43,7 +44,7 @@ public class DisciplinaOptativa extends Disciplina {
      * @return Lista de co-requisitos da disciplina
      */
     @Override
-    public LinkedList<Disciplina> getCoRequisitos() {
+    public List<Disciplina> getCoRequisitos() {
         return coRequisitos;
     }
 
@@ -75,7 +76,7 @@ public class DisciplinaOptativa extends Disciplina {
      * @param preRequisitos Lista com os novos pré-requisitos da disciplina
      */
     @Override
-    public void setPreRequisitos(LinkedList<Disciplina> preRequisitos) {
+    public void setPreRequisitos(List<List<Disciplina>> preRequisitos) {
         this.preRequisitos = preRequisitos;
     }
 
@@ -83,7 +84,7 @@ public class DisciplinaOptativa extends Disciplina {
      * @param coRequisitos Lista com os novos co-requisitos da disciplina
      */
     @Override
-    public void setCoRequisitos(LinkedList<Disciplina> coRequisitos) {
+    public void setCoRequisitos(List<Disciplina> coRequisitos) {
         this.coRequisitos = coRequisitos;
     }
 
@@ -92,8 +93,16 @@ public class DisciplinaOptativa extends Disciplina {
      */
     @Override
     public void addPreRequisito(Disciplina disciplina) {
-        this.preRequisitos.add(disciplina);
+        List<Disciplina> novoPrerequisito = new ArrayList<>();
+        novoPrerequisito.add(disciplina);
+        this.preRequisitos.add(novoPrerequisito);
     }
+
+    /**
+     * @param disciplinas Disciplina pre-requisito a adicionar
+     */
+    @Override
+    public void addPreRequisito(List<Disciplina> disciplinas) { this.preRequisitos.add(disciplinas); }
 
     /**
      * @param disciplina Disciplina co-requisito a adicionar
@@ -108,7 +117,7 @@ public class DisciplinaOptativa extends Disciplina {
      */
     @Override
     public void removePreRequisito(Disciplina disciplina) {
-        this.preRequisitos.remove(disciplina);
+        this.preRequisitos.removeIf(disciplina1 -> disciplina1.contains(disciplina));
     }
 
     /**
@@ -142,4 +151,5 @@ public class DisciplinaOptativa extends Disciplina {
     public int getPrecedencia() {
         return 1; // optativas precedência baixa
     }
+
 }
