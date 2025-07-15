@@ -1,7 +1,4 @@
 package ufjf.poo.model;
-/*
-ID da turma, capacidade máxima, número atual de alunos matriculados e o horário fixo da aula.
- */
 
 import ufjf.poo.model.disciplina.Disciplina;
 
@@ -16,7 +13,7 @@ public class Turma {
     private final Disciplina disciplina;
     private LinkedList<DiaHorario> horarios;
 
-    static int idTotal = 0;
+    public static int idTotal = 0;
 
     public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina, LinkedList<DiaHorario> horarios) {
         this.id = idTotal++;
@@ -24,6 +21,14 @@ public class Turma {
         this.numeroAlunosMatriculados = numeroAlunosMatriculados;
         this.horarios = horarios;
         this.disciplina = disciplina;
+    }
+
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, LinkedList<DiaHorario> horarios) {
+        this.id = idTotal++;
+        this.capacidadeMaxima = capacidadeMaxima;
+        this.numeroAlunosMatriculados = numeroAlunosMatriculados;
+        this.horarios = horarios;
+        this.disciplina = null;
     }
     public int getId() {
         return id;
@@ -43,12 +48,23 @@ public class Turma {
     public LinkedList<DiaHorario> getHorarios() {
         return horarios;
     }
+
+    public String getHorario() {
+        if (horarios == null || horarios.isEmpty()) {
+            return "";
+        }
+        return horarios.toString();
+    }
     public void setHorarios(LinkedList<DiaHorario> horarios) {
         this.horarios = horarios;
     }
 
     public boolean temVagasDisponiveis() {
         return numeroAlunosMatriculados < capacidadeMaxima;
+    }
+
+    public boolean temVaga() {
+        return temVagasDisponiveis();
     }
 
     public int getVagasRestantes() {
@@ -61,6 +77,13 @@ public class Turma {
             return true;
         }
         return false;
+    }
+
+    public void matricularAluno(String matriculaAluno) throws ufjf.poo.exception.TurmaCheiaException {
+        if (!temVagasDisponiveis()) {
+            throw new ufjf.poo.exception.TurmaCheiaException("Turma " + id + " está cheia");
+        }
+        numeroAlunosMatriculados++;
     }
 
     public boolean removerAluno() {
@@ -76,7 +99,9 @@ public class Turma {
             .anyMatch(horario -> outraTurma.getHorarios().contains(horario));
     }
 
-    public Disciplina getDisciplina() {return disciplina; }
+    public Disciplina getDisciplina() {
+        return disciplina; 
+    }
 
     @Override
     public String toString() {

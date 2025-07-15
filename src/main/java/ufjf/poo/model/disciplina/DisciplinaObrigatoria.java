@@ -134,4 +134,12 @@ public class DisciplinaObrigatoria extends Disciplina{
     public tipoDisciplina getTipo() {
         return tipoDisciplina.OBRIGATORIA;
     }
+
+    /**
+     * @return Retorna a precedência da disciplina (maior valor = maior precedência)
+     */
+    @Override
+    public int getPrecedencia() {
+        return 3; // obrigatórias precedência alta
+    }
 }

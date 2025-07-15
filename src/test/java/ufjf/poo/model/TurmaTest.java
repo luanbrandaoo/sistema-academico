@@ -17,7 +17,7 @@ class TurmaTest {
     
     @BeforeEach
     void setUp() {
-        // Reset do contador estático para testes isolados
+        // reset do contador estático para testes isolados
         Turma.idTotal = 0;
         
         horarios = new LinkedList<>();
@@ -85,18 +85,18 @@ class TurmaTest {
     @Test
     @DisplayName("Deve verificar se turma tem vagas disponíveis")
     void testVerificarVagasDisponiveis() {
-        // Turma com 30 vagas e 0 matriculados
+        // turma com 30 vagas e 0 matriculados
         assertTrue(turma.getNumeroAlunosMatriculados() < turma.getCapacidadeMaxima());
         
-        // Turma com 30 vagas e 25 matriculados
+        // turma com 30 vagas e 25 matriculados
         turma.setNumeroAlunosMatriculados(25);
         assertTrue(turma.getNumeroAlunosMatriculados() < turma.getCapacidadeMaxima());
         
-        // Turma lotada
+        // turma lotada
         turma.setNumeroAlunosMatriculados(30);
         assertFalse(turma.getNumeroAlunosMatriculados() < turma.getCapacidadeMaxima());
         
-        // Turma superlotada (cenário excepcional)
+        // turma superlotada (cenário excepcional)
         turma.setNumeroAlunosMatriculados(35);
         assertFalse(turma.getNumeroAlunosMatriculados() < turma.getCapacidadeMaxima());
     }
@@ -104,14 +104,14 @@ class TurmaTest {
     @Test
     @DisplayName("Deve calcular vagas restantes corretamente")
     void testCalcularVagasRestantes() {
-        // Turma vazia
+        // turma vazia
         assertEquals(30, turma.getCapacidadeMaxima() - turma.getNumeroAlunosMatriculados());
         
-        // Turma parcialmente ocupada
+        // turma parcialmente ocupada
         turma.setNumeroAlunosMatriculados(20);
         assertEquals(10, turma.getCapacidadeMaxima() - turma.getNumeroAlunosMatriculados());
         
-        // Turma lotada
+        // turma lotada
         turma.setNumeroAlunosMatriculados(30);
         assertEquals(0, turma.getCapacidadeMaxima() - turma.getNumeroAlunosMatriculados());
     }
@@ -137,25 +137,25 @@ class TurmaTest {
     @Test
     @DisplayName("Deve verificar conflito de horários entre turmas")
     void testConflitoHorarios() {
-        // Turma 1: Segunda 8h-10h, Quarta 8h-10h
+        // turma 1: Segunda 8h-10h, Quarta 8h-10h
         LinkedList<DiaHorario> horarios1 = new LinkedList<>();
         horarios1.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horarios1.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
         Turma turma1 = new Turma(30, 0, horarios1);
         
-        // Turma 2: Segunda 8h-10h (conflito), Sexta 10h-12h
+        // turma 2: Segunda 8h-10h (conflito), Sexta 10h-12h
         LinkedList<DiaHorario> horarios2 = new LinkedList<>();
         horarios2.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0))); // conflito
         horarios2.add(new DiaHorario(DayOfWeek.FRIDAY, LocalTime.of(10, 0)));
         Turma turma2 = new Turma(25, 0, horarios2);
         
-        // Turma 3: Terça 10h-12h, Quinta 14h-16h (sem conflito)
+        // turma 3: Terça 10h-12h, Quinta 14h-16h (sem conflito)
         LinkedList<DiaHorario> horarios3 = new LinkedList<>();
         horarios3.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
         horarios3.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(14, 0)));
         Turma turma3 = new Turma(20, 0, horarios3);
         
-        // Verificar conflitos
+        // verificar conflitos
         boolean temConflito12 = turma1.getHorarios().stream()
             .anyMatch(h1 -> turma2.getHorarios().contains(h1));
         assertTrue(temConflito12, "Deve haver conflito entre turma1 e turma2");
@@ -213,15 +213,15 @@ class TurmaTest {
     @Test
     @DisplayName("Deve validar estados de capacidade extremos")
     void testCapacidadeExtrema() {
-        // Turma com capacidade zero
+        // turma com capacidade zero
         Turma turmaCapacidadeZero = new Turma(0, 0, horarios);
         assertEquals(0, turmaCapacidadeZero.getCapacidadeMaxima());
         
-        // Turma com capacidade muito alta
+        // turma com capacidade muito alta
         Turma turmaCapacidadeAlta = new Turma(1000, 0, horarios);
         assertEquals(1000, turmaCapacidadeAlta.getCapacidadeMaxima());
         
-        // Situação onde matriculados > capacidade (situação excepcional)
+        // situação onde matriculados > capacidade (situação excepcional)
         turmaCapacidadeZero.setNumeroAlunosMatriculados(5);
         assertTrue(turmaCapacidadeZero.getNumeroAlunosMatriculados() > turmaCapacidadeZero.getCapacidadeMaxima());
     }
@@ -308,25 +308,25 @@ class TurmaTest {
     @Test
     @DisplayName("Deve detectar conflito de horário usando método específico")
     void testTemConflitoDeHorarioMetodo() {
-        // Turma 1: Segunda 8h, Quarta 8h
+        // turma 1: Segunda 8h, Quarta 8h
         LinkedList<DiaHorario> horarios1 = new LinkedList<>();
         horarios1.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0)));
         horarios1.add(new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(8, 0)));
         Turma turma1 = new Turma(30, 0, horarios1);
         
-        // Turma 2: Segunda 8h (conflito), Sexta 10h
+        // turma 2: Segunda 8h (conflito), Sexta 10h
         LinkedList<DiaHorario> horarios2 = new LinkedList<>();
         horarios2.add(new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0))); // conflito
         horarios2.add(new DiaHorario(DayOfWeek.FRIDAY, LocalTime.of(10, 0)));
         Turma turma2 = new Turma(25, 0, horarios2);
         
-        // Turma 3: Terça 10h, Quinta 14h (sem conflito)
+        // turma 3: Terça 10h, Quinta 14h (sem conflito)
         LinkedList<DiaHorario> horarios3 = new LinkedList<>();
         horarios3.add(new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0)));
         horarios3.add(new DiaHorario(DayOfWeek.THURSDAY, LocalTime.of(14, 0)));
         Turma turma3 = new Turma(20, 0, horarios3);
         
-        // Testar conflitos
+        // testar conflitos
         assertTrue(turma1.temConflitoDeHorario(turma2), "Deve haver conflito entre turma1 e turma2");
         assertTrue(turma2.temConflitoDeHorario(turma1), "Conflito deve ser simétrico");
         

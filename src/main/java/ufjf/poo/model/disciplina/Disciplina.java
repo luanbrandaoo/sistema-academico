@@ -1,6 +1,9 @@
 package ufjf.poo.model.disciplina;
 
+import ufjf.poo.model.Aluno;
+import ufjf.poo.controller.validadores.ValidadorPreRequisito;
 import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Disciplina {
     protected String codigo;
@@ -8,11 +11,15 @@ public abstract class Disciplina {
     protected int cargaHoraria;
     protected LinkedList<Disciplina> preRequisitos;
     protected LinkedList<Disciplina> coRequisitos;
+    protected List<ValidadorPreRequisito> validadores;
 
     public Disciplina(String codigo, String nome, int cargaHoraria) {
         this.codigo = codigo;
         this.nome = nome;
         this.cargaHoraria = cargaHoraria;
+        this.preRequisitos = new LinkedList<>();
+        this.coRequisitos = new LinkedList<>();
+        this.validadores = new java.util.ArrayList<>();
     }
 
     public abstract String getCodigo();
@@ -35,6 +42,24 @@ public abstract class Disciplina {
 
     public abstract int getCreditos();
     public abstract tipoDisciplina getTipo();
+    public abstract int getPrecedencia();
+    
+    public boolean validarPreRequisitos(Aluno aluno) {
+        return validadores.stream().allMatch(validador -> validador.validar(aluno, this));
+    }
+    
+    public void adicionarValidador(ValidadorPreRequisito validador) {
+        this.validadores.add(validador);
+    }
+    
+    public void removerValidador(ValidadorPreRequisito validador) {
+        this.validadores.remove(validador);
+    }
+    
+    public List<ValidadorPreRequisito> getValidadores() {
+        return validadores;
+    }
+    
     // equiparação?
 
     @Override

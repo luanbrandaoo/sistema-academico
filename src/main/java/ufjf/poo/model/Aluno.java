@@ -14,12 +14,14 @@ public class Aluno {
     private HashSet<NotaDisciplina> disciplinasPeriodo;
     private HashSet<NotaDisciplina> disciplinasHistorico;
     private ArrayList<HashSet<Disciplina>> planejamento;
+    private int cargaHorariaMaxima;
 
     public Aluno(String nome, String matricula) {
         this.nome = nome;
         this.planejamento = new ArrayList<>();
         this.disciplinasPeriodo = new HashSet<>();
         this.disciplinasHistorico = new HashSet<>();
+        this.cargaHorariaMaxima = 24;
         try { validaMatricula(matricula); }
         catch (MatriculaInvalidaException ignored) {}
         this.matricula = matricula;
@@ -74,6 +76,14 @@ public class Aluno {
     }
     public void setDisciplinasHistorico(HashSet<NotaDisciplina> disciplinasHistorico) {
         this.disciplinasHistorico = disciplinasHistorico;
+    }
+
+    public int getCargaHorariaMaxima() {
+        return cargaHorariaMaxima;
+    }
+
+    public void setCargaHorariaMaxima(int cargaHorariaMaxima) {
+        this.cargaHorariaMaxima = cargaHorariaMaxima;
     }
 
     private void validaMatricula (String matricula) throws MatriculaInvalidaException {

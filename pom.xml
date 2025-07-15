@@ -15,7 +15,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <exec.mainClass>ufjf.poo.Main</exec.mainClass>
+        <exec.mainClass>ufjf.poo.controller.SistemaAcademico</exec.mainClass>
         <junit.version>5.10.0</junit.version>
     </properties>
 
@@ -55,7 +55,7 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <mainClass>ufjf.poo.Main</mainClass>
+                                <mainClass>ufjf.poo.controller.SistemaAcademico</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
