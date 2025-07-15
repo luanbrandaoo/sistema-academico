@@ -1,12 +1,11 @@
 package ufjf.poo.model;
 
+import ufjf.poo.exception.MatriculaInvalidaException;
 import ufjf.poo.model.disciplina.Disciplina;
 import ufjf.poo.model.disciplina.NotaDisciplina;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import ufjf.poo.exception.MatriculaInvalidaException;
 
 public class Aluno {
     private String nome;
@@ -16,67 +15,34 @@ public class Aluno {
     private ArrayList<HashSet<Disciplina>> planejamento;
     private int cargaHorariaMaxima;
 
-    public Aluno(String nome, String matricula) {
+    public Aluno(String nome, String matricula) throws MatriculaInvalidaException {
         this.nome = nome;
         this.planejamento = new ArrayList<>();
         this.disciplinasPeriodo = new HashSet<>();
         this.disciplinasHistorico = new HashSet<>();
-        this.cargaHorariaMaxima = 24;
-        try { validaMatricula(matricula); }
-        catch (MatriculaInvalidaException ignored) {}
+        validaMatricula(matricula);
         this.matricula = matricula;
     }
 
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public String getMatricula() {
-        return matricula;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getMatricula() { return matricula; }
     public void setMatricula(String matricula) throws MatriculaInvalidaException {
         validaMatricula(matricula);
         this.matricula = matricula;
     }
-    public HashSet<NotaDisciplina> getDisciplinasPeriodo() {
-        return disciplinasPeriodo;
-    }
-    public void setDisciplinasPeriodo(HashSet<NotaDisciplina> disciplinasPeriodo) {
-        this.disciplinasPeriodo = disciplinasPeriodo;
-    }
-    public ArrayList<HashSet<Disciplina>> getPlanejamento() {
-        return planejamento;
-    }
-    public void setPlanejamento(ArrayList<HashSet<Disciplina>> planejamento) {
-        this.planejamento = planejamento;
-    }
-
-    public void adicionarDisciplina(NotaDisciplina disciplina) {
-        this.disciplinasPeriodo.add(disciplina);
-    }
-    public void removerDisciplina(NotaDisciplina disciplina) {
-        this.disciplinasPeriodo.remove(disciplina);
-    }
-    public void adicionarPeriodo(HashSet<Disciplina> periodo) {
-        this.planejamento.add(periodo);
-    }
-    public void removerPeriodo(HashSet<Disciplina> periodo) {
-        this.planejamento.remove(periodo);
-    }
-    public void adicionarConcluida(NotaDisciplina disciplina) {
-        this.disciplinasHistorico.add(disciplina);
-    }
-    public void removerConcluida(NotaDisciplina disciplina) {
-        this.disciplinasHistorico.remove(disciplina);
-    }
-    public HashSet<NotaDisciplina> getDisciplinasHistorico() {
-        return disciplinasHistorico;
-    }
-    public void setDisciplinasHistorico(HashSet<NotaDisciplina> disciplinasHistorico) {
-        this.disciplinasHistorico = disciplinasHistorico;
-    }
+    public HashSet<NotaDisciplina> getDisciplinasPeriodo() { return new HashSet<>(disciplinasPeriodo); }
+    public void setDisciplinasPeriodo(HashSet<NotaDisciplina> disciplinasPeriodo) { this.disciplinasPeriodo = disciplinasPeriodo; }
+    public ArrayList<HashSet<Disciplina>> getPlanejamento() { return new ArrayList<>(planejamento); }
+    public void setPlanejamento(ArrayList<HashSet<Disciplina>> planejamento) { this.planejamento = planejamento; }
+    public void adicionarDisciplina(NotaDisciplina disciplina) { this.disciplinasPeriodo.add(disciplina); }
+    public void removerDisciplina(NotaDisciplina disciplina) { this.disciplinasPeriodo.remove(disciplina); }
+    public void adicionarPeriodo(HashSet<Disciplina> periodo) { this.planejamento.add(periodo); }
+    public void removerPeriodo(HashSet<Disciplina> periodo) { this.planejamento.remove(periodo); }
+    public void adicionarConcluida(NotaDisciplina disciplina) { this.disciplinasHistorico.add(disciplina); }
+    public void removerConcluida(NotaDisciplina disciplina) { this.disciplinasHistorico.remove(disciplina); }
+    public HashSet<NotaDisciplina> getDisciplinasHistorico() { return new HashSet<>(disciplinasHistorico); }
+    public void setDisciplinasHistorico(HashSet<NotaDisciplina> disciplinasHistorico) { this.disciplinasHistorico = disciplinasHistorico; }
 
     public int getCargaHorariaMaxima() {
         return cargaHorariaMaxima;
@@ -116,25 +82,19 @@ public class Aluno {
     }
     
     public boolean concluiu(Disciplina disciplina) {
-        // verifica tanto no histórico quanto no período atual
         boolean noHistorico = disciplinasHistorico.stream()
             .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
-        
         boolean noPeriodo = disciplinasPeriodo.stream()
             .anyMatch(nd -> nd.disciplina().equals(disciplina) && nd.nota() >= 60.0f);
-            
         return noHistorico || noPeriodo;
     }
     
     public java.util.Map<Disciplina, Float> getDisciplinasCursadas() {
         java.util.Map<Disciplina, Float> todasDisciplinas = new java.util.HashMap<>();
-        // adiciona disciplinas do histórico e do período atual
-        disciplinasHistorico.stream()
+        disciplinasHistorico
             .forEach(nd -> todasDisciplinas.put(nd.disciplina(), nd.nota()));
-        
-        disciplinasPeriodo.stream()
+        disciplinasPeriodo
             .forEach(nd -> todasDisciplinas.put(nd.disciplina(), nd.nota()));
-            
         return todasDisciplinas;
     }
 }
