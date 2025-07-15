@@ -13,7 +13,7 @@ public class ValidadorLogicoAND implements ValidadorPreRequisito {
     }
 
     @Override
-    public boolean validar(Aluno aluno, Disciplina disciplina) {
+    public boolean validar(Aluno aluno) {
         return disciplinasRequeridas.stream()
                 .allMatch(aluno::concluiu);
     }

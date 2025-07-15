@@ -1,10 +1,8 @@
 package ufjf.poo.controller.validadores;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.Test;
 import ufjf.poo.model.Aluno;
 import ufjf.poo.model.disciplina.Disciplina;
 import ufjf.poo.model.disciplina.DisciplinaObrigatoria;
@@ -12,6 +10,8 @@ import ufjf.poo.model.disciplina.NotaDisciplina;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Testes do ValidadorLogicoAND")
 class ValidadorLogicoANDTest {
@@ -32,7 +32,10 @@ class ValidadorLogicoANDTest {
         
         List<Disciplina> disciplinasRequeridas = Arrays.asList(disciplina1, disciplina2, disciplina3);
         validador = new ValidadorLogicoAND(disciplinasRequeridas);
-        aluno = new Aluno("João Silva", "202501001");
+        assertDoesNotThrow(
+                () -> aluno = new Aluno("João Silva", "202501001"),
+                "Teste de criar aluno falhou"
+        );
     }
     
     @Test
@@ -43,7 +46,7 @@ class ValidadorLogicoANDTest {
         aluno.adicionarDisciplina(new NotaDisciplina(65.0f, disciplina2));
         aluno.adicionarDisciplina(new NotaDisciplina(80.0f, disciplina3));
         
-        assertTrue(validador.validar(aluno, disciplinaAtual));
+        assertTrue(validador.validar(aluno));
     }
     
     @Test
@@ -54,7 +57,7 @@ class ValidadorLogicoANDTest {
         aluno.adicionarDisciplina(new NotaDisciplina(60.0f, disciplina2));
         aluno.adicionarDisciplina(new NotaDisciplina(60.0f, disciplina3));
         
-        assertTrue(validador.validar(aluno, disciplinaAtual));
+        assertTrue(validador.validar(aluno));
     }
     
     @Test
@@ -65,7 +68,7 @@ class ValidadorLogicoANDTest {
         aluno.adicionarDisciplina(new NotaDisciplina(65.0f, disciplina2));
         // disciplina3 não foi cursada
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
@@ -76,14 +79,14 @@ class ValidadorLogicoANDTest {
         aluno.adicionarDisciplina(new NotaDisciplina(59.0f, disciplina2)); // Nota insuficiente
         aluno.adicionarDisciplina(new NotaDisciplina(80.0f, disciplina3));
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
     @DisplayName("Deve falhar quando nenhuma disciplina foi cursada")
     void testValidacaoFalhaNenhumaDisciplinaCursada() {
         // aluno não cursou nenhuma disciplina
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
@@ -94,6 +97,6 @@ class ValidadorLogicoANDTest {
         aluno.adicionarDisciplina(new NotaDisciplina(45.0f, disciplina2));
         aluno.adicionarDisciplina(new NotaDisciplina(30.0f, disciplina3));
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
 }

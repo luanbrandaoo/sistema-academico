@@ -1,14 +1,14 @@
 package ufjf.poo.controller.validadores;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.Test;
 import ufjf.poo.model.Aluno;
 import ufjf.poo.model.disciplina.Disciplina;
 import ufjf.poo.model.disciplina.DisciplinaObrigatoria;
 import ufjf.poo.model.disciplina.NotaDisciplina;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Testes do ValidadorCreditosMinimos")
 class ValidadorCreditosMininosTest {
@@ -29,7 +29,10 @@ class ValidadorCreditosMininosTest {
         
         // validador que exige 10 créditos mínimos
         validador = new ValidadorCreditosMinimos(10);
-        aluno = new Aluno("João Silva", "202501001");
+        assertDoesNotThrow(
+                () -> aluno = new Aluno("João Silva", "202501001"),
+                "Teste de criar aluno falhou"
+        );
     }
     
     @Test
@@ -45,7 +48,7 @@ class ValidadorCreditosMininosTest {
         Disciplina disciplinaExtra = new DisciplinaObrigatoria("MAT004", "Geometria", 45); // 3 créditos
         aluno.adicionarDisciplina(new NotaDisciplina(60.0f, disciplinaExtra));
         
-        assertTrue(validador.validar(aluno, disciplinaAtual));
+        assertTrue(validador.validar(aluno));
     }
     
     @Test
@@ -57,7 +60,7 @@ class ValidadorCreditosMininosTest {
         aluno.adicionarDisciplina(new NotaDisciplina(80.0f, disciplina3)); // 5 créditos
         // total: 12 créditos
         
-        assertTrue(validador.validar(aluno, disciplinaAtual));
+        assertTrue(validador.validar(aluno));
     }
     
     @Test
@@ -68,14 +71,14 @@ class ValidadorCreditosMininosTest {
         aluno.adicionarDisciplina(new NotaDisciplina(65.0f, disciplina2)); // 3 créditos
         // total: 7 créditos (menos que 10)
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
     @DisplayName("Deve falhar quando aluno não cursou nenhuma disciplina")
     void testValidacaoFalhaNenhumaDisciplina() {
         // aluno não cursou nenhuma disciplina
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
@@ -86,7 +89,7 @@ class ValidadorCreditosMininosTest {
         aluno.adicionarDisciplina(new NotaDisciplina(45.0f, disciplina2)); // Não conta
         aluno.adicionarDisciplina(new NotaDisciplina(30.0f, disciplina3)); // Não conta
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
@@ -98,7 +101,7 @@ class ValidadorCreditosMininosTest {
         aluno.adicionarDisciplina(new NotaDisciplina(80.0f, disciplina3)); // 5 créditos - conta
         // total de créditos válidos: 4 + 5 = 9 créditos (menos que 10)
         
-        assertFalse(validador.validar(aluno, disciplinaAtual));
+        assertFalse(validador.validar(aluno));
     }
     
     @Test
@@ -107,10 +110,10 @@ class ValidadorCreditosMininosTest {
         ValidadorCreditosMinimos validadorZero = new ValidadorCreditosMinimos(0);
         
         // qualquer aluno deve passar com créditos mínimos zero
-        assertTrue(validadorZero.validar(aluno, disciplinaAtual));
+        assertTrue(validadorZero.validar(aluno));
         
         // mesmo com disciplinas cursadas
         aluno.adicionarDisciplina(new NotaDisciplina(70.0f, disciplina1));
-        assertTrue(validadorZero.validar(aluno, disciplinaAtual));
+        assertTrue(validadorZero.validar(aluno));
     }
 }
