@@ -1,332 +1,231 @@
 package ufjf.poo.controller;
 
+import ufjf.poo.exception.*;
 import ufjf.poo.model.Aluno;
+import ufjf.poo.model.DiaHorario;
 import ufjf.poo.model.Turma;
 import ufjf.poo.model.disciplina.Disciplina;
+import ufjf.poo.model.disciplina.NotaDisciplina;
+import ufjf.poo.model.disciplina.tipoDisciplina;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import ufjf.poo.exception.*;
-
-
 public class SistemaAcademico {
-    private Map<String, Disciplina> disciplinas;
-    private Map<String, Turma> turmas;
-    private Map<String, Aluno> alunos;
+    private final Map<String, Disciplina> disciplinas;
+    private final Map<Integer, Turma> turmas;
+    private final Map<String, Aluno> alunos;
+    private final Map<Turma, Disciplina> turmaDisciplina;
 
     public SistemaAcademico() {
+        this.turmaDisciplina = new HashMap<>();
         this.disciplinas = new HashMap<>();
         this.turmas = new HashMap<>();
         this.alunos = new HashMap<>();
     }
 
-    public void addDisciplina(Disciplina disciplina) {
-        disciplinas.put(disciplina.getCodigo(), disciplina);
-    }
-
-    public void addTurma(Turma turma) {
-        turmas.put(String.valueOf(turma.getId()), turma);
-    }
-
-    public void addAluno(Aluno aluno) {
-        alunos.put(aluno.getMatricula(), aluno);
-    }
-
-    public List<ResultadoMatricula> planejamentoMatricula(String matriculaAluno, List<String> idsTurmasDesejadas) {
+    public RelatorioMatricula planejamentoMatricula(String matriculaAluno,
+                                                          List<Integer> idsTurmasDesejadas) {
         Aluno aluno = alunos.get(matriculaAluno);
-        if (aluno == null) {
+        if (aluno == null)
             throw new IllegalArgumentException("Aluno não encontrado");
-        }
 
         List<ResultadoMatricula> resultados = new ArrayList<>();
         List<Turma> turmasValidadas = new ArrayList<>();
         int cargaHorariaAcumulada = 0;
+        final int cargaHorariaMaximaPadrao = 22;
 
-
-        List<Turma> turmasOrdenadas = idsTurmasDesejadas.stream()
-                .map(id -> turmas.get(id))
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(t -> t.getDisciplina().getPrecedencia()))
-                .collect(Collectors.toList());
+        List<Turma> turmasOrdenadas = obterTurmasOrdenadas(idsTurmasDesejadas);
 
         for (Turma turma : turmasOrdenadas) {
+            Disciplina disciplina = turmaDisciplina.get(turma);
+            if (disciplina == null) {
+                resultados.add(new ResultadoMatricula(null, turma, false, "Disciplina não encontrada para a turma"));
+                continue;
+            }
             try {
-                if (cargaHorariaAcumulada + turma.getDisciplina().getCargaHoraria() > aluno.getCargaHorariaMaxima()) {
-                    resultados.add(new ResultadoMatricula(
-                            turma.getDisciplina().getCodigo(),
-                            String.valueOf(turma.getId()),
-                            false,
-                            "Carga horária máxima excedida"
-                    ));
+                if (jaMatriculadoNaDisciplina(disciplina, turmasValidadas)) {
+                    resultados.add(new ResultadoMatricula(disciplina, turma, false,
+                            "Já matriculado em outra turma desta disciplina"));
                     continue;
                 }
-
-                if (!turma.getDisciplina().validarPreRequisitos(aluno)) {
-                    resultados.add(new ResultadoMatricula(
-                            turma.getDisciplina().getCodigo(),
-                            String.valueOf(turma.getId()),
-                            false,
-                            "Pré-requisitos não atendidos"
-                    ));
+                if (cargaHorariaAcumulada + disciplina.getCargaHoraria() > cargaHorariaMaximaPadrao) {
+                    resultados.add(new ResultadoMatricula(disciplina, turma, false,
+                            "Carga horária máxima excedida"));
                     continue;
                 }
-
-                if (!turma.temVaga()) {
-                    resultados.add(new ResultadoMatricula(
-                            turma.getDisciplina().getCodigo(),
-                            String.valueOf(turma.getId()),
-                            false,
-                            "Turma cheia"
-                    ));
-                    continue;
-                }
-
-                if (temConflitoHorario(turma, turmasValidadas)) {
-                    String msgConflito = resolverConflitoHorario(turma, turmasValidadas);
-                    if (msgConflito != null) {
-                        resultados.add(new ResultadoMatricula(
-                                turma.getDisciplina().getCodigo(),
-                                String.valueOf(turma.getId()),
-                                false,
-                                msgConflito
-                        ));
-                        continue;
-                    }
-                }
-
-                if (!verificarCoRequisitos(turma, idsTurmasDesejadas)) {
-                    resultados.add(new ResultadoMatricula(
-                            turma.getDisciplina().getCodigo(),
-                            String.valueOf(turma.getId()),
-                            false,
-                            "Co-requisitos não atendidos"
-                    ));
-                    continue;
-                }
-
+                validarVagasNaTurma(turma);
+                validarPreRequisitos(aluno, disciplina);
+                validarCoRequisitos(disciplina, idsTurmasDesejadas);
+                validarConflitoHorario(turma, turmasValidadas);
                 turmasValidadas.add(turma);
-                cargaHorariaAcumulada += turma.getDisciplina().getCargaHoraria();
+                cargaHorariaAcumulada += disciplina.getCargaHoraria();
+                resultados.add(new ResultadoMatricula(disciplina, turma, true,
+                        "Matrícula realizada com sucesso"));
 
-                resultados.add(new ResultadoMatricula(
-                        turma.getDisciplina().getCodigo(),
-                        String.valueOf(turma.getId()),
-                        true,
-                        "Matrícula realizada com sucesso"
-                ));
-
-            } catch (Exception e) {
-                resultados.add(new ResultadoMatricula(
-                        turma.getDisciplina().getCodigo(),
-                        String.valueOf(turma.getId()),
-                        false,
-                        e.getMessage()
-                ));
+            } catch (MatriculaException e) {
+                resultados.add(new ResultadoMatricula(disciplina, turma, false, e.getMessage()));
             }
         }
-
-
-        for (ResultadoMatricula resultado : resultados) {
-            if (resultado.isAceita()) {
-                try {
-                    turmas.get(resultado.getIdTurma()).matricularAluno(matriculaAluno);
-                } catch (TurmaCheiaException e) {
-                    // Não deveria acontecer, mas por segurança
-                }
-            }
-        }
-
-        return resultados;
+        efetuarMatriculas(aluno, turmasValidadas);
+        return new RelatorioMatricula(resultados);
     }
 
-    private boolean temConflitoHorario(Turma novaTurma, List<Turma> turmasValidadas) {
+    private List<Turma> obterTurmasOrdenadas(List<Integer> idsTurmasDesejadas) {
+        return idsTurmasDesejadas.stream()
+                .map(turmas::get)
+                .filter(Objects::nonNull)
+                .sorted(this::compararPrecedencia)
+                .collect(Collectors.toList());
+    }
+
+    private int compararPrecedencia(Turma t1, Turma t2) {
+        Disciplina d1 = turmaDisciplina.get(t1);
+        Disciplina d2 = turmaDisciplina.get(t2);
+
+        if (d1 == null || d2 == null) return 0;
+
+        int prec1 = obterPrecedencia(d1.getTipo());
+        int prec2 = obterPrecedencia(d2.getTipo());
+
+        return Integer.compare(prec1, prec2);
+    }
+
+    private int obterPrecedencia(tipoDisciplina tipo) {
+        return switch (tipo) {
+            case OBRIGATORIA -> 1;
+            case ELETIVA -> 2;
+            case OPTATIVA -> 3;
+        };
+    }
+
+    private boolean jaMatriculadoNaDisciplina(Disciplina disciplina, List<Turma> turmasValidadas) {
         return turmasValidadas.stream()
-                .anyMatch(turma -> turma.getHorario().equals(novaTurma.getHorario()));
+                .anyMatch(turma -> turmaDisciplina.get(turma).equals(disciplina));
     }
 
-    private String resolverConflitoHorario(Turma novaTurma, List<Turma> turmasValidadas) {
-        for (Turma turmaExistente : turmasValidadas) {
-            if (turmaExistente.getHorario().equals(novaTurma.getHorario())) {
-                int precedenciaNova = novaTurma.getDisciplina().getPrecedencia();
-                int precedenciaExistente = turmaExistente.getDisciplina().getPrecedencia();
+    private void validarVagasNaTurma(Turma turma) throws TurmaCheiaException {
+        if (turma.getNumeroAlunosMatriculados() >= turma.getCapacidadeMaxima())
+            throw new TurmaCheiaException("Turma " + turma.getId() + " não possui vagas");
+    }
+
+    private void validarPreRequisitos(Aluno aluno, Disciplina disciplina) throws PreRequisitoNaoCumpridoException {
+        if (disciplina.getPreRequisitos() == null || disciplina.getPreRequisitos().isEmpty())
+            return;
+
+        for (List<Disciplina> preRequisito : disciplina.getPreRequisitos()) { //pre requisitos
+            boolean concluiu = false;
+            for(Disciplina preRequisitoAux : preRequisito) { // equivalencias dos requisitos
+                concluiu |= aluno.concluiu(preRequisitoAux);
+            }
+            if (!concluiu) {
+                throw new PreRequisitoNaoCumpridoException(
+                        "Pré-requisito não cumprido: " + preRequisito.getFirst().getCodigo() +
+                                " - " + preRequisito.getFirst().getNome());
+            }
+        }
+    }
+
+    private void validarCoRequisitos(Disciplina disciplina, List<Integer> idsTurmasDesejadas)
+            throws CoRequisitoNaoAtendidoException {
+        if (disciplina.getCoRequisitos() == null || disciplina.getCoRequisitos().isEmpty())
+            return;
+
+        Set<String> disciplinasDesejadas = idsTurmasDesejadas.stream()
+                .map(turmas::get)
+                .filter(Objects::nonNull)
+                .map(turmaDisciplina::get)
+                .filter(Objects::nonNull)
+                .map(Disciplina::getCodigo)
+                .collect(Collectors.toSet());
+
+        for (Disciplina coRequisito : disciplina.getCoRequisitos()) {
+            if (!disciplinasDesejadas.contains(coRequisito.getCodigo())) {
+                throw new CoRequisitoNaoAtendidoException(
+                        "Co-requisito não selecionado: " + coRequisito.getCodigo() + " - " + coRequisito.getNome());
+            }
+        }
+    }
+
+    private void validarConflitoHorario(Turma novaTurma, List<Turma> turmasAceitas)
+            throws ConflitoDeHorarioException {
+        for (Turma turmaExistente : turmasAceitas) {
+            if (temConflitoHorario(novaTurma, turmaExistente)) {
+                Disciplina disciplinaNova = turmaDisciplina.get(novaTurma);
+                Disciplina disciplinaExistente = turmaDisciplina.get(turmaExistente);
+
+                int precedenciaNova = obterPrecedencia(disciplinaNova.getTipo());
+                int precedenciaExistente = obterPrecedencia(disciplinaExistente.getTipo());
 
                 if (precedenciaNova > precedenciaExistente) {
-                    return "Conflito de horário - disciplina com menor precedência";
+                    throw new ConflitoDeHorarioException(
+                            "Conflito de horário com disciplina de maior precedência: " +
+                                    disciplinaExistente.getCodigo());
                 } else if (precedenciaNova == precedenciaExistente) {
-                    return "Conflito de horário entre disciplinas de mesma precedência";
+                    throw new ConflitoDeHorarioException(
+                            "Conflito de horário entre disciplinas de mesma precedência: " +
+                                    disciplinaExistente.getCodigo());
                 }
+                turmasAceitas.remove(turmaExistente);
+                break;
             }
         }
-        return null;
     }
 
-    private boolean verificarCoRequisitos(Turma turma, List<String> idsTurmasDesejadas) {
-        LinkedList<Disciplina> coRequisitos = turma.getDisciplina().getCoRequisitos();
-        if (coRequisitos == null || coRequisitos.isEmpty()) {
-            return true;
-        }
+    private boolean temConflitoHorario(Turma turma1, Turma turma2) {
+        Set<DiaHorario> horarios1Set = new HashSet<>(turma1.getHorarios());
+        return turma2.getHorarios().stream().anyMatch(horarios1Set::contains);
+    }
 
-        for (Disciplina coRequisito : coRequisitos) {
-            boolean encontrado = idsTurmasDesejadas.stream()
-                    .anyMatch(idTurma -> {
-                        Turma t = turmas.get(idTurma);
-                        return t != null && t.getDisciplina().getCodigo().equals(coRequisito.getCodigo());
-                    });
-            if (!encontrado) {
-                return false;
+    private void efetuarMatriculas(Aluno aluno, List<Turma> turmasAceitas) {
+        for (Turma turma : turmasAceitas) {
+            turma.setNumeroAlunosMatriculados(turma.getNumeroAlunosMatriculados() + 1);
+            Disciplina disciplina = turmaDisciplina.get(turma);
+            if (disciplina != null) {
+                NotaDisciplina notaDisciplina = new NotaDisciplina(0.0f, disciplina);
+                aluno.adicionarDisciplina(notaDisciplina);
             }
         }
-        return true;
     }
 
-    public String gerarRelatorio(List<ResultadoMatricula> resultados) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== RELATÓRIO DE MATRÍCULA ===\n\n");
-
-        int aceitas = 0;
-        int rejeitadas = 0;
-
-        for (ResultadoMatricula resultado : resultados) {
-            sb.append("Disciplina: ").append(resultado.getCodigoDisciplina()).append("\n");
-            sb.append("Turma: ").append(resultado.getIdTurma()).append("\n");
-            sb.append("Status: ").append(resultado.isAceita() ? "ACEITA" : "REJEITADA").append("\n");
-            sb.append("Motivo: ").append(resultado.getMotivo()).append("\n");
-            sb.append("---\n");
-
-            if (resultado.isAceita()) {
-                aceitas++;
-            } else {
-                rejeitadas++;
-            }
+    public void concluirPeriodo(String matriculaAluno, Map<String, Float> notasDisciplinas) {
+        Aluno aluno = alunos.get(matriculaAluno);
+        if (aluno == null) {
+            throw new IllegalArgumentException("Aluno não encontrado: " + matriculaAluno);
         }
 
-        sb.append("\nRESUMO:\n");
-        sb.append("Matrículas aceitas: ").append(aceitas).append("\n");
-        sb.append("Matrículas rejeitadas: ").append(rejeitadas).append("\n");
+        Set<NotaDisciplina> disciplinasPeriodo = new HashSet<>(aluno.getDisciplinasPeriodo());
 
-        return sb.toString();
-    }
+        for (NotaDisciplina notaDisciplina : disciplinasPeriodo) {
+            String codigoDisciplina = notaDisciplina.disciplina().getCodigo();
+            Float nota = notasDisciplinas.get(codigoDisciplina);
 
-    public Map<String, Disciplina> getDisciplinas() { return disciplinas; }
-    public Map<String, Turma> getTurmas() { return turmas; }
-    public Map<String, Aluno> getAlunos() { return alunos; }
-
-    public static void main(String[] args) {
-        System.out.println("=== Sistema Acadêmico de Planejamento ===");
-        System.out.println("Sistema inicializado com sucesso!");
-        System.out.println();
-        
-        // criando uma instância do sistema para demonstração
-        SistemaAcademico sistema = new SistemaAcademico();
-        executarTestesDemo(sistema);
-    }
-    
-    private static void executarTestesDemo(SistemaAcademico sistema) {
-        System.out.println("Executando testes demonstrativos...");
-        System.out.println("=======================================");
-        
-        try {
-            // configurar disciplinas
-            var calcI = new ufjf.poo.model.disciplina.DisciplinaObrigatoria("CALC001", "Cálculo I", 4);
-            var progI = new ufjf.poo.model.disciplina.DisciplinaEletiva("PROG001", "Programação I", 6);
-            var filosofia = new ufjf.poo.model.disciplina.DisciplinaOptativa("FIL001", "Filosofia", 2);
-            
-            sistema.addDisciplina(calcI);
-            sistema.addDisciplina(progI);
-            sistema.addDisciplina(filosofia);
-            
-            // configurar aluno
-            var aluno = new ufjf.poo.model.Aluno("João Silva", "202501001");
-            aluno.setCargaHorariaMaxima(24);
-            sistema.addAluno(aluno);
-            
-            // configurar horários
-            var horario1 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario1.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.MONDAY, java.time.LocalTime.of(8, 0)));
-            
-            var horario2 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario2.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.TUESDAY, java.time.LocalTime.of(10, 0)));
-            
-            var horario3 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario3.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.WEDNESDAY, java.time.LocalTime.of(14, 0)));
-            
-            // configurar turmas
-            var turma1 = new ufjf.poo.model.Turma(30, 0, calcI, horario1);
-            var turma2 = new ufjf.poo.model.Turma(25, 0, progI, horario2);
-            var turma3 = new ufjf.poo.model.Turma(20, 0, filosofia, horario3);
-            
-            sistema.addTurma(turma1);
-            sistema.addTurma(turma2);
-            sistema.addTurma(turma3);
-            
-            System.out.println("Disciplinas cadastradas:");
-            System.out.println("- " + calcI.getCodigo() + " - " + calcI.getNome() + " (" + calcI.getCargaHoraria() + "h) - " + calcI.getTipo());
-            System.out.println("- " + progI.getCodigo() + " - " + progI.getNome() + " (" + progI.getCargaHoraria() + "h) - " + progI.getTipo());
-            System.out.println("- " + filosofia.getCodigo() + " - " + filosofia.getNome() + " (" + filosofia.getCargaHoraria() + "h) - " + filosofia.getTipo());
-            System.out.println();
-            
-            System.out.println("Aluno: " + aluno.getNome() + " (Matrícula: " + aluno.getMatricula() + ")");
-            System.out.println("Carga horária máxima: " + aluno.getCargaHorariaMaxima() + "h");
-            System.out.println();
-            
-            // teste 1: Matrícula simples
-            System.out.println("TESTE 1: Matrícula simples em todas as disciplinas");
-            System.out.println("---------------------------------------------------");
-            
-            var idsDesejados = java.util.Arrays.asList("0", "1", "2");
-            var resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
-            
-            for (var resultado : resultados) {
-                String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
-                System.out.println(status + " - " + resultado.getCodigoDisciplina() + 
-                                 " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
+            if (nota != null) {
+                NotaDisciplina disciplinaConcluida = new NotaDisciplina(nota, notaDisciplina.disciplina());
+                aluno.adicionarConcluida(disciplinaConcluida);
             }
-            System.out.println();
-            
-            // teste 2: Excesso de carga horária
-            System.out.println("TESTE 2: Testando limite de carga horária (8h máximo)");
-            System.out.println("--------------------------------------------------------");
-            
-            aluno.setCargaHorariaMaxima(8);
-            resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
-            
-            for (var resultado : resultados) {
-                String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
-                System.out.println(status + " - " + resultado.getCodigoDisciplina() + 
-                                 " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
-            }
-            System.out.println();
-            
-            // teste 3: Pré-requisitos
-            System.out.println("TESTE 3: Testando pré-requisitos (PROG001 requer CALC001)");
-            System.out.println("------------------------------------------------------------");
-            
-            aluno.setCargaHorariaMaxima(24); // restaurar limite
-            progI.adicionarValidador(new ufjf.poo.controller.validadores.ValidadorSimples(calcI));
-            
-            var apenasProgI = java.util.Arrays.asList("1"); // apenas PROG001
-            resultados = sistema.planejamentoMatricula("202501001", apenasProgI);
-            
-            for (var resultado : resultados) {
-                String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
-                System.out.println(status + " - " + resultado.getCodigoDisciplina() + 
-                                 " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
-            }
-            System.out.println();
-            
-            // teste 4: Relatório final
-            System.out.println("TESTE 4: Geração de relatório completo");
-            System.out.println("------------------------------------------");
-            
-            var relatorio = sistema.gerarRelatorio(resultados);
-            System.out.println(relatorio);
-            
-            System.out.println("Todos os testes demonstrativos executados com sucesso!");
-            System.out.println();
-            
-        } catch (Exception e) {
-            System.err.println("Erro durante a execução dos testes: " + e.getMessage());
-            e.printStackTrace();
         }
+        aluno.getDisciplinasPeriodo().clear();
     }
+
+    public List<Turma> buscarTurmasPorDisciplina(String codigoDisciplina) {
+        return turmaDisciplina.entrySet().stream()
+                .filter(entry -> entry.getValue().getCodigo().equals(codigoDisciplina))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    public void addTurma(Turma turma) {
+        turmas.put(turma.getId(), turma);
+        turmaDisciplina.put(turma, turma.getDisciplina());
+    }
+    public void addAluno(Aluno aluno) { alunos.put(aluno.getMatricula(), aluno); }
+    public void addDisciplina(Disciplina disciplina) { disciplinas.put(disciplina.getCodigo(), disciplina); }
+    public Disciplina buscarDisciplina(String codigo) { return disciplinas.get(codigo); }
+    public Turma buscarTurma(int id) { return turmas.get(id); }
+    public Aluno buscarAluno(String matricula) { return alunos.get(matricula); }
+    public Map<String, Disciplina> getDisciplinas() { return new HashMap<>(disciplinas); }
+    public Map<Integer, Turma> getTurmas() { return new HashMap<>(turmas); }
+    public Map<String, Aluno> getAlunos() { return new HashMap<>(alunos); }
+    public Map<Turma, Disciplina> getTurmaDisciplina() { return new HashMap<>(turmaDisciplina); }
 }
