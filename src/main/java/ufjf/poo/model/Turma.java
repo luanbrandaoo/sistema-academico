@@ -1,35 +1,43 @@
 package ufjf.poo.model;
 
+import ufjf.poo.exception.TurmaCheiaException;
 import ufjf.poo.model.disciplina.Disciplina;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Turma {
     private final int id;
     private int capacidadeMaxima;
     private int numeroAlunosMatriculados;
     private final Disciplina disciplina;
-    private LinkedList<DiaHorario> horarios;
+    private List<DiaHorario> horarios;
+    private List<String> alunosMatriculados;
 
-    public static int idTotal = 0;
+    static int idTotal = 0;
 
-    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina, LinkedList<DiaHorario> horarios) {
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina,
+                 List<String> alunosMatriculados, List<DiaHorario> horarios) {
         this.id = idTotal++;
         this.capacidadeMaxima = capacidadeMaxima;
         this.numeroAlunosMatriculados = numeroAlunosMatriculados;
         this.horarios = horarios;
         this.disciplina = disciplina;
+        this.alunosMatriculados = alunosMatriculados;
     }
 
-    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, LinkedList<DiaHorario> horarios) {
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, List<DiaHorario> horarios) {
         this.id = idTotal++;
         this.capacidadeMaxima = capacidadeMaxima;
         this.numeroAlunosMatriculados = numeroAlunosMatriculados;
         this.horarios = horarios;
         this.disciplina = null;
+        this.alunosMatriculados = new LinkedList<>();
     }
+
     public int getId() {
         return id;
     }
@@ -45,17 +53,10 @@ public class Turma {
     public void setNumeroAlunosMatriculados(int numeroAlunosMatriculados) {
         this.numeroAlunosMatriculados = numeroAlunosMatriculados;
     }
-    public LinkedList<DiaHorario> getHorarios() {
-        return horarios;
+    public List<DiaHorario> getHorarios() {
+        return new ArrayList<>(horarios);
     }
-
-    public String getHorario() {
-        if (horarios == null || horarios.isEmpty()) {
-            return "";
-        }
-        return horarios.toString();
-    }
-    public void setHorarios(LinkedList<DiaHorario> horarios) {
+    public void setHorarios(List<DiaHorario> horarios) {
         this.horarios = horarios;
     }
 
@@ -63,26 +64,21 @@ public class Turma {
         return numeroAlunosMatriculados < capacidadeMaxima;
     }
 
-    public boolean temVaga() {
-        return temVagasDisponiveis();
-    }
-
     public int getVagasRestantes() {
         return Math.max(0, capacidadeMaxima - numeroAlunosMatriculados);
     }
-
-    public boolean adicionarAluno() {
-        if (temVagasDisponiveis()) {
-            numeroAlunosMatriculados++;
-            return true;
-        }
-        return false;
+    public List<String> getAlunosMatriculados() {
+        return new ArrayList<>(alunosMatriculados);
+    }
+    public void setAlunosMatriculados(List<String> alunosMatriculados) {
+        this.alunosMatriculados = alunosMatriculados;
     }
 
-    public void matricularAluno(String matriculaAluno) throws ufjf.poo.exception.TurmaCheiaException {
+    public void matriculaAluno(String alunoMatricula) throws TurmaCheiaException {
         if (!temVagasDisponiveis()) {
-            throw new ufjf.poo.exception.TurmaCheiaException("Turma " + id + " está cheia");
+            throw new TurmaCheiaException("Turma " + id + " está cheia");
         }
+        alunosMatriculados.add(alunoMatricula);
         numeroAlunosMatriculados++;
     }
 
@@ -99,9 +95,7 @@ public class Turma {
             .anyMatch(horario -> outraTurma.getHorarios().contains(horario));
     }
 
-    public Disciplina getDisciplina() {
-        return disciplina; 
-    }
+    public Disciplina getDisciplina() {return disciplina; }
 
     @Override
     public String toString() {
@@ -109,7 +103,7 @@ public class Turma {
                 ", numeroAlunosMatriculados=" + numeroAlunosMatriculados +
                 ", horario=" + horarios + '}';
     }
-    public LinkedList<DiaHorario> formataDiaHorario(LinkedList<DiaHorario> horarios, DayOfWeek dia, int hora) {
+    public List<DiaHorario> formataDiaHorario(List<DiaHorario> horarios, DayOfWeek dia, int hora) {
         if (horarios == null)
             horarios = new LinkedList<>();
         final int minutos = 0;
