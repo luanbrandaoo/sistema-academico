@@ -3,7 +3,7 @@ package ufjf.poo.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-class RelatorioMatricula {
+public class RelatorioMatricula {
     private final List<ResultadoMatricula> resultados;
     private final int totalAceitas;
     private final int totalRejeitadas;
