@@ -12,10 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SistemaAcademico {
-    private final Map<String, Disciplina> disciplinas;
-    private final Map<Integer, Turma> turmas;
-    private final Map<String, Aluno> alunos;
-    private final Map<Turma, Disciplina> turmaDisciplina;
+    private Map<String, Disciplina> disciplinas;
+    private Map<Integer, Turma> turmas;
+    private Map<String, Aluno> alunos;
+    private Map<Turma, Disciplina> turmaDisciplina;
 
     public SistemaAcademico() {
         this.turmaDisciplina = new HashMap<>();
