@@ -106,13 +106,13 @@ public class SistemaAcademicoTest {
     void testTurmaCheia() {
         turma1.setCapacidadeMaxima(0); // turma sem vagas
         
-        List<Integer> idsDesejados = Arrays.asList(0);
+        List<Integer> idsDesejados = List.of(0);
         RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
         List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
-        assertFalse(resultados.get(0).isAceita());
-        assertTrue(resultados.get(0).getMotivo().contains("Turma cheia"));
+        assertFalse(resultados.getFirst().isAceita());
+        assertTrue(resultados.getFirst().getMotivo().contains("Turma cheia"));
     }
 
     @Test
@@ -133,13 +133,13 @@ public class SistemaAcademicoTest {
         // configurar pré-requisito: progI requer calcI
         progI.adicionarValidador(new ValidadorSimples(calcI));
         
-        List<Integer> idsDesejados = Arrays.asList(1); // Apenas PROG001
+        List<Integer> idsDesejados = List.of(1); // Apenas PROG001
         RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
         List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
-        assertFalse(resultados.get(0).isAceita());
-        assertTrue(resultados.get(0).getMotivo().contains("Pré-requisitos não atendidos"));
+        assertFalse(resultados.getFirst().isAceita());
+        assertTrue(resultados.getFirst().getMotivo().contains("Pré-requisitos não atendidos"));
     }
 
     @Test
@@ -150,11 +150,11 @@ public class SistemaAcademicoTest {
         // adicionar calcI ao histórico do aluno com nota suficiente
         aluno.adicionarConcluida(new NotaDisciplina(80.0f, calcI));
         
-        List<Integer> idsDesejados = Arrays.asList(1); // apenas PROG001
+        List<Integer> idsDesejados = List.of(1); // apenas PROG001
         RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
         List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
-        assertTrue(resultados.get(0).isAceita());
+        assertTrue(resultados.getFirst().isAceita());
     }
 }
