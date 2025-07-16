@@ -333,7 +333,7 @@ public class SistemaAcademico {
             aluno.setCargaHorariaMaxima(24); // restaurar limite
             progI.adicionarValidador(new ufjf.poo.controller.validadores.ValidadorSimples(calcI));
             
-            var apenasProgI = java.util.Arrays.asList(1); // apenas PROG001
+            var apenasProgI = List.of(1); // apenas PROG001
             relatorio = sistema.planejamentoMatricula("202501001", apenasProgI);
             resultados = relatorio.getResultados();
             
