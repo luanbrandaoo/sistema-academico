@@ -144,12 +144,4 @@ public class DisciplinaOptativa extends Disciplina {
         return tipoDisciplina.OPTATIVA;
     }
 
-    /**
-     * @return Retorna a precedência da disciplina (maior valor = maior precedência)
-     */
-    @Override
-    public int getPrecedencia() {
-        return 1; // optativas precedência baixa
-    }
-
 }

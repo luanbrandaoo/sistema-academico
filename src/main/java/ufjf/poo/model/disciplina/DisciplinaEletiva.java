@@ -143,12 +143,4 @@ public class DisciplinaEletiva extends Disciplina {
         return tipoDisciplina.ELETIVA;
     }
 
-    /**
-     * @return Retorna a precedência da disciplina (maior valor = maior precedência)
-     */
-    @Override
-    public int getPrecedencia() {
-        return 2; // eletivas precedência média
-    }
-
 }
