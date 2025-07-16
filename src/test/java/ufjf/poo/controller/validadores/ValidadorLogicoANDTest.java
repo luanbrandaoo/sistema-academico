@@ -39,7 +39,7 @@ class ValidadorLogicoANDTest {
     }
     
     @Test
-    @DisplayName("Deve validar com sucesso quando todas as disciplinas pré-requisito foram cursadas com nota >= 60")
+    @DisplayName("Deve validar com sucesso quando todas as disciplinas pré-requisito foram cursadas com nota maior ou igual 60")
     void testValidacaoSucessoTodasDisciplinas() {
         // aluno cursou todas as disciplinas pré-requisito com notas suficientes
         aluno.adicionarDisciplina(new NotaDisciplina(70.0f, disciplina1));
@@ -72,9 +72,8 @@ class ValidadorLogicoANDTest {
     }
     
     @Test
-    @DisplayName("Deve falhar quando uma disciplina foi cursada com nota < 60")
+    @DisplayName("Deve falhar quando uma disciplina foi cursada com nota menor que 60")
     void testValidacaoFalhaUmaNotaInsuficiente() {
-        // aluno cursou todas as disciplinas, mas uma com nota insuficiente
         aluno.adicionarDisciplina(new NotaDisciplina(70.0f, disciplina1));
         aluno.adicionarDisciplina(new NotaDisciplina(59.0f, disciplina2)); // Nota insuficiente
         aluno.adicionarDisciplina(new NotaDisciplina(80.0f, disciplina3));
@@ -85,14 +84,12 @@ class ValidadorLogicoANDTest {
     @Test
     @DisplayName("Deve falhar quando nenhuma disciplina foi cursada")
     void testValidacaoFalhaNenhumaDisciplinaCursada() {
-        // aluno não cursou nenhuma disciplina
         assertFalse(validador.validar(aluno));
     }
     
     @Test
     @DisplayName("Deve falhar quando todas as disciplinas foram cursadas com notas insuficientes")
     void testValidacaoFalhaTodasNotasInsuficientes() {
-        // aluno cursou todas as disciplinas com notas insuficientes
         aluno.adicionarDisciplina(new NotaDisciplina(50.0f, disciplina1));
         aluno.adicionarDisciplina(new NotaDisciplina(45.0f, disciplina2));
         aluno.adicionarDisciplina(new NotaDisciplina(30.0f, disciplina3));

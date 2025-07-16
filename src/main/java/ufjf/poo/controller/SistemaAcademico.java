@@ -110,12 +110,10 @@ public class SistemaAcademico {
     }
 
     private void validarPreRequisitos(Aluno aluno, Disciplina disciplina) throws PreRequisitoNaoCumpridoException {
-        // Validar pré-requisitos usando validadores
         if (!disciplina.validarPreRequisitos(aluno)) {
             throw new PreRequisitoNaoCumpridoException("Pré-requisitos não atendidos");
         }
         
-        // Validar pré-requisitos legado
         if (disciplina.getPreRequisitos() == null || disciplina.getPreRequisitos().isEmpty())
             return;
 
@@ -355,7 +353,6 @@ public class SistemaAcademico {
             
             System.out.println("Todos os testes demonstrativos executados com sucesso!");
             System.out.println();
-            System.out.println("Para executar os testes unitários completos, use: mvn test");
             
         } catch (Exception e) {
             System.err.println("Erro durante a execução dos testes: " + e.getMessage());
