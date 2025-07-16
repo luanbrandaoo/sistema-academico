@@ -1,7 +1,20 @@
 package ufjf.poo;
 
+import ufjf.poo.controller.RelatorioMatricula;
+import ufjf.poo.controller.ResultadoMatricula;
 import ufjf.poo.controller.SistemaAcademico;
+import ufjf.poo.controller.validadores.ValidadorSimples;
+import ufjf.poo.model.Aluno;
+import ufjf.poo.model.DiaHorario;
+import ufjf.poo.model.Turma;
+import ufjf.poo.model.disciplina.DisciplinaEletiva;
+import ufjf.poo.model.disciplina.DisciplinaObrigatoria;
+import ufjf.poo.model.disciplina.DisciplinaOptativa;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Main {
@@ -21,33 +34,28 @@ public class Main {
 
         try {
             // configurar disciplinas
-            var calcI = new ufjf.poo.model.disciplina.DisciplinaObrigatoria("CALC001", "Cálculo I", 4);
-            var progI = new ufjf.poo.model.disciplina.DisciplinaEletiva("PROG001", "Programação I", 6);
-            var filosofia = new ufjf.poo.model.disciplina.DisciplinaOptativa("FIL001", "Filosofia", 2);
+            DisciplinaObrigatoria calcI = new DisciplinaObrigatoria("CALC001", "Cálculo I", 4);
+            DisciplinaEletiva progI = new DisciplinaEletiva("PROG001", "Programação I", 6);
+            DisciplinaOptativa filosofia = new DisciplinaOptativa("FIL001", "Filosofia", 2);
 
             sistema.addDisciplina(calcI);
             sistema.addDisciplina(progI);
             sistema.addDisciplina(filosofia);
 
             // configurar aluno
-            var aluno = new ufjf.poo.model.Aluno("João Silva", "202501001");
+            Aluno aluno = new Aluno("João Silva", "202501001");
             aluno.setCargaHorariaMaxima(24);
             sistema.addAluno(aluno);
 
             // configurar horários
-            var horario1 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario1.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.MONDAY, java.time.LocalTime.of(8, 0)));
-
-            var horario2 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario2.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.TUESDAY, java.time.LocalTime.of(10, 0)));
-
-            var horario3 = new java.util.LinkedList<ufjf.poo.model.DiaHorario>();
-            horario3.add(new ufjf.poo.model.DiaHorario(java.time.DayOfWeek.WEDNESDAY, java.time.LocalTime.of(14, 0)));
+            DiaHorario horario1 = new DiaHorario(DayOfWeek.MONDAY, LocalTime.of(8, 0));
+            DiaHorario horario2 = new DiaHorario(DayOfWeek.TUESDAY, LocalTime.of(10, 0));
+            DiaHorario horario3 = new DiaHorario(DayOfWeek.WEDNESDAY, LocalTime.of(14, 0));
 
             // configurar turmas
-            var turma1 = new ufjf.poo.model.Turma(30, 0, calcI, horario1);
-            var turma2 = new ufjf.poo.model.Turma(25, 0, progI, horario2);
-            var turma3 = new ufjf.poo.model.Turma(20, 0, filosofia, horario3);
+            Turma turma2 = new Turma(25, 0, progI, Collections.singletonList(horario2));
+            Turma turma1 = new Turma(30, 0, calcI, Collections.singletonList(horario1));
+            Turma turma3 = new Turma(20, 0, filosofia, Collections.singletonList(horario3));
 
             sistema.addTurma(turma1);
             sistema.addTurma(turma2);
@@ -67,11 +75,11 @@ public class Main {
             System.out.println("TESTE 1: Matrícula simples em todas as disciplinas");
             System.out.println("---------------------------------------------------");
 
-            var idsDesejados = java.util.Arrays.asList(0, 1, 2);
-            var relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
-            var resultados = relatorio.getResultados();
+            List<Integer> idsDesejados = Arrays.asList(0, 1, 2);
+            RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
+            List<ResultadoMatricula> resultados = relatorio.getResultados();
 
-            for (var resultado : resultados) {
+            for (ResultadoMatricula resultado : resultados) {
                 String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
                 System.out.println(status + " - " + resultado.getCodigoDisciplina() +
                         " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
@@ -86,7 +94,7 @@ public class Main {
             relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
             resultados = relatorio.getResultados();
 
-            for (var resultado : resultados) {
+            for (ResultadoMatricula resultado : resultados) {
                 String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
                 System.out.println(status + " - " + resultado.getCodigoDisciplina() +
                         " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
@@ -98,13 +106,13 @@ public class Main {
             System.out.println("------------------------------------------------------------");
 
             aluno.setCargaHorariaMaxima(24); // restaurar limite
-            progI.adicionarValidador(new ufjf.poo.controller.validadores.ValidadorSimples(calcI));
+            progI.adicionarValidador(new ValidadorSimples(calcI));
 
-            var apenasProgI = List.of(1); // apenas PROG001
+            List<Integer> apenasProgI = List.of(1); // apenas PROG001
             relatorio = sistema.planejamentoMatricula("202501001", apenasProgI);
             resultados = relatorio.getResultados();
 
-            for (var resultado : resultados) {
+            for (ResultadoMatricula resultado : resultados) {
                 String status = resultado.isAceita() ? "ACEITA" : "REJEITADA";
                 System.out.println(status + " - " + resultado.getCodigoDisciplina() +
                         " (Turma " + resultado.getIdTurma() + "): " + resultado.getMotivo());
