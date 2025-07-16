@@ -3,7 +3,6 @@ package ufjf.poo.model.disciplina;
 import ufjf.poo.model.Aluno;
 import ufjf.poo.controller.validadores.ValidadorPreRequisito;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public abstract class Disciplina {
     protected int cargaHoraria;
     protected List<List<Disciplina>> preRequisitos;
     protected List<Disciplina> coRequisitos;
-    protected List<ValidadorPreRequisito> validadores;
+    protected final List<ValidadorPreRequisito> validadores;
 
     public Disciplina(String codigo, String nome, int cargaHoraria) {
         this.codigo = codigo;
