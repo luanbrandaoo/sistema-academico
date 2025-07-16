@@ -19,9 +19,10 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== Sistema Acadêmico de Planejamento ===");
-        System.out.println("Sistema inicializado com sucesso!");
-        System.out.println();
+        System.out.println("""
+        === Sistema Acadêmico de Planejamento ===
+        Sistema inicializado com sucesso!
+        """);
 
         // criando uma instância do sistema para demonstração
         SistemaAcademico sistema = new SistemaAcademico();
