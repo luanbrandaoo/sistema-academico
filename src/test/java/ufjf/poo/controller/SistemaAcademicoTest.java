@@ -2,6 +2,7 @@ package ufjf.poo.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ufjf.poo.exception.MatriculaInvalidaException;
 import ufjf.poo.model.Aluno;
 import ufjf.poo.model.DiaHorario;
 import ufjf.poo.model.Turma;
@@ -29,7 +30,7 @@ public class SistemaAcademicoTest {
     private Turma turma1, turma2, turma3;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws MatriculaInvalidaException {
         // reset do contador estático para testes isolados
         Turma.idTotal = 0;
         
@@ -71,9 +72,10 @@ public class SistemaAcademicoTest {
 
     @Test
     void testMatriculaSimples() {
-        List<String> idsDesejados = Arrays.asList("0", "1", "2");
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(0, 1, 2);
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
         
+        List<ResultadoMatricula> resultados = relatorio.getResultados();
         assertEquals(3, resultados.size());
         
         // deve aceitar todas as disciplinas pois não há conflitos nem pré-requisitos
@@ -86,8 +88,9 @@ public class SistemaAcademicoTest {
     void testExcedeCargaHoraria() {
         aluno.setCargaHorariaMaxima(8); // apenas 8 horas permitidas
         
-        List<String> idsDesejados = Arrays.asList("0", "1", "2");
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(0, 1, 2);
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(3, resultados.size());
         
@@ -103,8 +106,9 @@ public class SistemaAcademicoTest {
     void testTurmaCheia() {
         turma1.setCapacidadeMaxima(0); // turma sem vagas
         
-        List<String> idsDesejados = Arrays.asList("0");
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(0);
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
         assertFalse(resultados.get(0).isAceita());
@@ -113,15 +117,15 @@ public class SistemaAcademicoTest {
 
     @Test
     void testGerarRelatorio() {
-        List<String> idsDesejados = Arrays.asList("0", "1");
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(0, 1);
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
         
-        String relatorio = sistema.gerarRelatorio(resultados);
+        String relatorioString = sistema.gerarRelatorio(relatorio.getResultados());
         
-        assertNotNull(relatorio);
-        assertTrue(relatorio.contains("RELATÓRIO DE MATRÍCULA"));
-        assertTrue(relatorio.contains("CALC001"));
-        assertTrue(relatorio.contains("PROG001"));
+        assertNotNull(relatorioString);
+        assertTrue(relatorioString.contains("RELATÓRIO DE MATRÍCULA"));
+        assertTrue(relatorioString.contains("CALC001"));
+        assertTrue(relatorioString.contains("PROG001"));
     }
 
     @Test
@@ -129,8 +133,9 @@ public class SistemaAcademicoTest {
         // configurar pré-requisito: progI requer calcI
         progI.adicionarValidador(new ValidadorSimples(calcI));
         
-        List<String> idsDesejados = Arrays.asList("1"); // Apenas PROG001
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(1); // Apenas PROG001
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
         assertFalse(resultados.get(0).isAceita());
@@ -145,8 +150,9 @@ public class SistemaAcademicoTest {
         // adicionar calcI ao histórico do aluno com nota suficiente
         aluno.adicionarConcluida(new NotaDisciplina(80.0f, calcI));
         
-        List<String> idsDesejados = Arrays.asList("1"); // apenas PROG001
-        List<ResultadoMatricula> resultados = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<Integer> idsDesejados = Arrays.asList(1); // apenas PROG001
+        RelatorioMatricula relatorio = sistema.planejamentoMatricula("202501001", idsDesejados);
+        List<ResultadoMatricula> resultados = relatorio.getResultados();
         
         assertEquals(1, resultados.size());
         assertTrue(resultados.get(0).isAceita());

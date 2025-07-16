@@ -33,7 +33,7 @@ public class Aluno {
     }
     public HashSet<NotaDisciplina> getDisciplinasPeriodo() { return new HashSet<>(disciplinasPeriodo); }
     public void setDisciplinasPeriodo(HashSet<NotaDisciplina> disciplinasPeriodo) { this.disciplinasPeriodo = disciplinasPeriodo; }
-    public ArrayList<HashSet<Disciplina>> getPlanejamento() { return new ArrayList<>(planejamento); }
+    public ArrayList<HashSet<Disciplina>> getPlanejamento() { return planejamento; }
     public void setPlanejamento(ArrayList<HashSet<Disciplina>> planejamento) { this.planejamento = planejamento; }
     public void adicionarDisciplina(NotaDisciplina disciplina) { this.disciplinasPeriodo.add(disciplina); }
     public void removerDisciplina(NotaDisciplina disciplina) { this.disciplinasPeriodo.remove(disciplina); }

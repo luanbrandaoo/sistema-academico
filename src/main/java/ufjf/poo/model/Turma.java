@@ -17,7 +17,7 @@ public class Turma {
     private List<DiaHorario> horarios;
     private List<String> alunosMatriculados;
 
-    static int idTotal = 0;
+    public static int idTotal = 0;
 
     public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina,
                  List<String> alunosMatriculados, List<DiaHorario> horarios) {
@@ -27,6 +27,15 @@ public class Turma {
         this.horarios = horarios;
         this.disciplina = disciplina;
         this.alunosMatriculados = alunosMatriculados;
+    }
+
+    public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, Disciplina disciplina, List<DiaHorario> horarios) {
+        this.id = idTotal++;
+        this.capacidadeMaxima = capacidadeMaxima;
+        this.numeroAlunosMatriculados = numeroAlunosMatriculados;
+        this.horarios = horarios;
+        this.disciplina = disciplina;
+        this.alunosMatriculados = new LinkedList<>();
     }
 
     public Turma(int capacidadeMaxima, int numeroAlunosMatriculados, List<DiaHorario> horarios) {

@@ -48,7 +48,7 @@ public abstract class Disciplina {
     public abstract int getPrecedencia();
 
     public boolean validarPreRequisitos(Aluno aluno) {
-        return validadores.stream().allMatch(validador -> validador.validar(aluno, this));
+        return validadores.stream().allMatch(validador -> validador.validar(aluno));
     }
 
     public void adicionarValidador(ValidadorPreRequisito validador) {
