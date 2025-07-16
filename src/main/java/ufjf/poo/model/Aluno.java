@@ -20,7 +20,7 @@ public class Aluno {
         this.planejamento = new ArrayList<>();
         this.disciplinasPeriodo = new HashSet<>();
         this.disciplinasHistorico = new HashSet<>();
-        this.cargaHorariaMaxima = 22;
+        this.cargaHorariaMaxima = 24;
         validaMatricula(matricula);
         this.matricula = matricula;
     }
