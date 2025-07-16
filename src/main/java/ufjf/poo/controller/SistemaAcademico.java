@@ -7,7 +7,6 @@ import ufjf.poo.model.Turma;
 import ufjf.poo.model.disciplina.Disciplina;
 import ufjf.poo.model.disciplina.NotaDisciplina;
 import ufjf.poo.model.disciplina.tipoDisciplina;
-import ufjf.poo.controller.validadores.ValidadorLogicoAND;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,8 +55,7 @@ public class SistemaAcademico {
                     continue;
                 }
                 validarVagasNaTurma(turma);
-                ValidadorLogicoAND preRequisitos = new ValidadorLogicoAND(disciplina.getPreRequisitos());
-                preRequisitos.validar(aluno);
+                validarPreRequisitos(aluno, disciplina);
                 validarCoRequisitos(disciplina, idsTurmasDesejadas);
                 validarConflitoHorario(turma, turmasValidadas);
                 turmasValidadas.add(turma);
@@ -109,6 +107,27 @@ public class SistemaAcademico {
     private void validarVagasNaTurma(Turma turma) throws TurmaCheiaException {
         if (turma.getNumeroAlunosMatriculados() >= turma.getCapacidadeMaxima())
             throw new TurmaCheiaException("Turma " + turma.getId() + " não possui vagas");
+    }
+
+    private void validarPreRequisitos(Aluno aluno, Disciplina disciplina) throws PreRequisitoNaoCumpridoException {
+        if (!disciplina.validarPreRequisitos(aluno)) {
+            throw new PreRequisitoNaoCumpridoException("Pré-requisitos não atendidos");
+        }
+        
+        if (disciplina.getPreRequisitos() == null || disciplina.getPreRequisitos().isEmpty())
+            return;
+
+        for (List<Disciplina> preRequisito : disciplina.getPreRequisitos()) { //pre requisitos
+            boolean concluiu = false;
+            for(Disciplina preRequisitoAux : preRequisito) { // equivalencias dos requisitos
+                concluiu |= aluno.concluiu(preRequisitoAux);
+            }
+            if (!concluiu) {
+                throw new PreRequisitoNaoCumpridoException(
+                        "Pré-requisito não cumprido: " + preRequisito.getFirst().getCodigo() +
+                                " - " + preRequisito.getFirst().getNome());
+            }
+        }
     }
 
     private void validarCoRequisitos(Disciplina disciplina, List<Integer> idsTurmasDesejadas)

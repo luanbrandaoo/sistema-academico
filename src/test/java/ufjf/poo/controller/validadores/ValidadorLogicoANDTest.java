@@ -30,7 +30,7 @@ class ValidadorLogicoANDTest {
         disciplina3 = new DisciplinaObrigatoria("FIS001", "Física I", 60);
         disciplinaAtual = new DisciplinaObrigatoria("MAT003", "Cálculo III", 60);
         
-        List<List<Disciplina>> disciplinasRequeridas = Arrays.asList(List.of(disciplina1), List.of(disciplina2), List.of(disciplina3));
+        List<Disciplina> disciplinasRequeridas = Arrays.asList(disciplina1, disciplina2, disciplina3);
         validador = new ValidadorLogicoAND(disciplinasRequeridas);
         assertDoesNotThrow(
                 () -> aluno = new Aluno("João Silva", "202501001"),
