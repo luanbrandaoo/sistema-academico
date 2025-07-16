@@ -91,8 +91,8 @@ public class Turma {
         numeroAlunosMatriculados++;
     }
 
-    public boolean removerAluno(Aluno aluno) {
-        if (alunosMatriculados.remove(aluno.getMatricula())) {
+    public boolean removerAluno(String alunoMatriucla) {
+        if (alunosMatriculados.remove(alunoMatriucla)) {
             numeroAlunosMatriculados--;
             return true;
         }
