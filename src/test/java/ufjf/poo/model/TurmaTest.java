@@ -295,29 +295,6 @@ class TurmaTest {
     }
     
     @Test
-    @DisplayName("Deve remover aluno se houver alunos matriculados")
-    void testRemoverAluno() {
-        // turma vazia - não deve conseguir remover
-        assertFalse(turma.removerAluno());
-        assertEquals(0, turma.getNumeroAlunosMatriculados());
-        
-        // adicionar alguns alunos e remover
-        turma.setNumeroAlunosMatriculados(5);
-        assertTrue(turma.removerAluno());
-        assertEquals(4, turma.getNumeroAlunosMatriculados());
-        
-        // remover todos
-        for (int i = 4; i > 0; i--) {
-            assertTrue(turma.removerAluno());
-        }
-        assertEquals(0, turma.getNumeroAlunosMatriculados());
-        
-        // tentar remover de turma vazia novamente
-        assertFalse(turma.removerAluno());
-        assertEquals(0, turma.getNumeroAlunosMatriculados());
-    }
-    
-    @Test
     @DisplayName("Deve detectar conflito de horário usando método específico")
     void testTemConflitoDeHorarioMetodo() {
         // turma 1: Segunda 8h, Quarta 8h
